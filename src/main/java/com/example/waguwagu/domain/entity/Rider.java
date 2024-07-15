@@ -13,7 +13,6 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "RIDERS")
-@Data
 public class Rider {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -49,6 +48,8 @@ public class Rider {
     @Column(name = "RIDER_ACCOUNT")
     private String riderAccount;
 
-    @OneToMany(mappedBy = "rider", cascade = CascadeType.ALL)
-    private List<RiderDeliveryHistory> riderDeliveryHistories;
+//    @OneToMany(mappedBy = "rider", cascade = CascadeType.ALL)
+    @Setter
+    @Column(name = "RIDER_IS_DELETED")
+    private boolean riderIsDeleted;
 }

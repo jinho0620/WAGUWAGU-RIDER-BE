@@ -21,7 +21,7 @@ public class RiderServiceImpl implements RiderService {
     @Override
     @Transactional
     public void updateRider(Long id, RiderUpdateDto req) {
-        Rider rider = riderRepository.findById(id).orElseThrow(IllegalArgumentException::new);
+        Rider rider = riderRepository.findByRiderIdAndRiderIsDeletedFalse(id).orElseThrow(IllegalArgumentException::new);
         rider.setRiderEmail(req.riderEmail());
         rider.setRiderNickname(req.riderNickname());
         rider.setRiderAccount(req.riderAccount());
@@ -32,19 +32,21 @@ public class RiderServiceImpl implements RiderService {
 
     @Override
     public Rider getById(Long id) {
-        Rider rider = riderRepository.findById(id).orElseThrow(IllegalArgumentException::new);
+        Rider rider = riderRepository.findByRiderIdAndRiderIsDeletedFalse(id).orElseThrow(IllegalArgumentException::new);
         return rider;
     }
 
     @Override
+    @Transactional
     public void deleteById(Long id) {
-        riderRepository.deleteById(id);
+        Rider rider = riderRepository.findByRiderIdAndRiderIsDeletedFalse(id).orElseThrow(IllegalArgumentException::new);
+        rider.setRiderIsDeleted(true);
     }
 
     @Override
     @Transactional
     public void changeActivationState(Long id) {
-        Rider rider = riderRepository.findById(id).orElseThrow(IllegalArgumentException::new);
+        Rider rider = riderRepository.findByRiderIdAndRiderIsDeletedFalse(id).orElseThrow(IllegalArgumentException::new);
         rider.setRiderIsActive(!rider.isRiderIsActive());
     }
 }
