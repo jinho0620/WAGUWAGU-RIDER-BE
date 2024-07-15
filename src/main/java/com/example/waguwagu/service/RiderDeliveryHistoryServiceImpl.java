@@ -29,7 +29,7 @@ public class RiderDeliveryHistoryServiceImpl implements RiderDeliveryHistoryServ
 
     @Override
     public List<RiderDeliveryHistoryResponseDto> getDeliveryHistories(Long riderId, DurationForHistoryDto dto) {
-        List<RiderDeliveryHistory> histories = riderDeliveryHistoryRepository.findByRider_RiderIdAndRiderIncomeCreatedAtBetween(riderId, dto.from().atStartOfDay(), dto.to().plusDays(1).atStartOfDay());
+        List<RiderDeliveryHistory> histories = riderDeliveryHistoryRepository.findByRider_RiderIdAndRiderDeliveryHistoryIsDeletedFalseAndRiderIncomeCreatedAtBetween(riderId, dto.from().atStartOfDay(), dto.to().plusDays(1).atStartOfDay());
         List<RiderDeliveryHistoryResponseDto> response = new ArrayList<>();
         histories.forEach(history -> response.add(RiderDeliveryHistoryResponseDto.from(history)));
         return response;
