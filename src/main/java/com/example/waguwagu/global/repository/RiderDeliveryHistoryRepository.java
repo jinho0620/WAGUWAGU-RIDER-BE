@@ -8,5 +8,5 @@ import java.util.List;
 import java.util.UUID;
 
 public interface RiderDeliveryHistoryRepository extends JpaRepository<RiderDeliveryHistory, Long> {
-    List<RiderDeliveryHistory> findByRider_RiderIdAndRiderDeliveryHistoryIsDeletedFalseAndRiderIncomeCreatedAtBetween(Long riderId, LocalDateTime from, LocalDateTime to);
+    List<RiderDeliveryHistory> findByRider_RiderIdAndRider_RiderIsDeletedFalseAndRiderDeliveryHistoryIsDeletedFalseAndRiderIncomeCreatedAtBetween(Long riderId, LocalDateTime from, LocalDateTime to);
 }
