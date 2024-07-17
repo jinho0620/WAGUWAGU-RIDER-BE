@@ -3,11 +3,12 @@ package com.example.waguwagu.domain.response;
 import java.time.LocalDateTime;
 
 public record RiderAssignResponseDto(
+        Long orderId,
         String storeName,
         String storeAddress,
         int deliveryPay,
         LocalDateTime due,
-        int distanceFromStoreToCustomer,
+        double distanceFromStoreToCustomer,
         double distanceFromStoreToRider
 
 ) {
