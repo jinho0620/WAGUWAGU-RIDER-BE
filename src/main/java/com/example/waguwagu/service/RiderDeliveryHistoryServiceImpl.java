@@ -2,7 +2,7 @@ package com.example.waguwagu.service;
 
 import com.example.waguwagu.domain.entity.Rider;
 import com.example.waguwagu.domain.entity.RiderDeliveryHistory;
-import com.example.waguwagu.global.repository.RiderDeliveryHistoryRepository;
+import com.example.waguwagu.global.dao.RiderDeliveryHistoryDao;
 import com.example.waguwagu.domain.request.DurationForHistoryDto;
 import com.example.waguwagu.domain.request.RiderDeliveryHistoryRequestDto;
 import com.example.waguwagu.domain.response.RiderDeliveryHistoryResponseDto;
@@ -16,7 +16,7 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class RiderDeliveryHistoryServiceImpl implements RiderDeliveryHistoryService {
-    private final RiderDeliveryHistoryRepository riderDeliveryHistoryRepository;
+    private final RiderDeliveryHistoryDao riderDeliveryHistoryDao;
     private final RiderService riderService;
 
     @Override
@@ -24,12 +24,15 @@ public class RiderDeliveryHistoryServiceImpl implements RiderDeliveryHistoryServ
     public void saveDeliveryHistory(Long riderId, RiderDeliveryHistoryRequestDto req) {
         Rider rider = riderService.getById(riderId);
         RiderDeliveryHistory history = req.toEntity(rider);
-        riderDeliveryHistoryRepository.save(history);
+        riderDeliveryHistoryDao.save(history);
     }
 
     @Override
     public List<RiderDeliveryHistoryResponseDto> getDeliveryHistories(Long riderId, DurationForHistoryDto dto) {
-        List<RiderDeliveryHistory> histories = riderDeliveryHistoryRepository.findByRider_RiderIdAndRider_RiderIsDeletedFalseAndRiderDeliveryHistoryIsDeletedFalseAndRiderIncomeCreatedAtBetween(riderId, dto.from().atStartOfDay(), dto.to().plusDays(1).atStartOfDay());
+        List<RiderDeliveryHistory> histories = riderDeliveryHistoryDao.findByIdBetweenTheseDates(
+                riderId,
+                dto.from().atStartOfDay(),
+                dto.to().plusDays(1).atStartOfDay());
         List<RiderDeliveryHistoryResponseDto> response = new ArrayList<>();
         histories.forEach(history -> response.add(RiderDeliveryHistoryResponseDto.from(history)));
         return response;
