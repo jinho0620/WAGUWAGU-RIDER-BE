@@ -2,11 +2,12 @@ package com.example.waguwagu.service;
 
 import com.example.waguwagu.domain.entity.DeliveryRequest;
 import com.example.waguwagu.domain.entity.Rider;
-import com.example.waguwagu.domain.request.DeliveryRequestDto;
 import com.example.waguwagu.domain.request.RiderAssignRequestDto;
 import com.example.waguwagu.domain.response.RiderAssignResponseDto;
 import com.example.waguwagu.domain.type.RiderTransportation;
 import com.example.waguwagu.global.repository.DeliveryRequestRepository;
+import com.example.waguwagu.kafka.dto.KafkaDeliveryRequestDto;
+import com.example.waguwagu.kafka.KafkaStatus;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.RequiredArgsConstructor;
@@ -21,6 +22,7 @@ import org.springframework.data.redis.core.GeoOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
+import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
 
 
@@ -41,26 +43,19 @@ import java.util.List;
 6. 가게 이름/주소, 배달료, 배달 목표 시간, 가게~라이더 사이 거리, 가게~고객 거리를 라이더한테 줌 @back
 */
 public class DeliveryRequestServiceImpl implements DeliveryRequestService {
-
     private final DeliveryRequestRepository deliveryRequestRepository;
     private final RiderService riderService;
+    private final RedisTemplate<String, String> redisTemplate;
 
     @Override
     public List<RiderAssignResponseDto> assignRider(Long riderId, RiderAssignRequestDto req) {
-        LettuceConnectionFactory connectionFactory = new LettuceConnectionFactory();
-        connectionFactory.afterPropertiesSet();
-        RedisTemplate<String, String> geoTemplate = new RedisTemplate<>();
-        geoTemplate.setConnectionFactory(connectionFactory);
-        geoTemplate.setKeySerializer(new StringRedisSerializer());
-        geoTemplate.setValueSerializer(new Jackson2JsonRedisSerializer<>(new ObjectMapper(), DeliveryRequest.class));
-        geoTemplate.afterPropertiesSet();
 
         List<DeliveryRequest> deliveryRequests = deliveryRequestRepository.findAll();
         System.out.println(deliveryRequests);
         String key = "points";
         Metric metric = RedisGeoCommands.DistanceUnit.KILOMETERS;
         Point myLocation = new Point(req.longitude(), req.latitude());
-        GeoOperations<String, String> geoOperations = geoTemplate.opsForGeo();
+        GeoOperations<String, String> geoOperations = redisTemplate.opsForGeo();
         geoOperations.add(key, myLocation, "me");
         List<RiderAssignResponseDto> list = new ArrayList<>();
         Rider rider = riderService.getById(riderId);
@@ -72,7 +67,8 @@ public class DeliveryRequestServiceImpl implements DeliveryRequestService {
             String storeDistrict = storeAddress[1];
 
             // 가게가 내 활동 범위에 있는지, 배달 요청에 내 이동수단이 포함되는지 확인
-            if(rider.getRiderActivityArea().contains(storeDistrict) && deliveryRequest.getTransportations().contains(rider.getRiderTransportation())) {
+            if(rider.getRiderActivityArea().contains(storeDistrict)
+                    && deliveryRequest.getTransportations().contains(rider.getRiderTransportation())) {
                 // 맞다면 요청 목록에 추가
                 geoOperations.add(
                         key,
@@ -82,6 +78,7 @@ public class DeliveryRequestServiceImpl implements DeliveryRequestService {
                 System.out.println(distance);
                 System.out.println(distance.getValue());
                 RiderAssignResponseDto response = new RiderAssignResponseDto(
+                        deliveryRequest.getOrderId(),
                         deliveryRequest.getStoreName(),
                         deliveryRequest.getStoreAddress(),
                         deliveryRequest.getDeliveryPay(),
@@ -96,32 +93,37 @@ public class DeliveryRequestServiceImpl implements DeliveryRequestService {
         return list;
     }
 
+//    @Override
+//    public List<DeliveryRequest> getAll() {
+//        return deliveryRequestRepository.findAll();
+//    }
 
-    @Override
-    public void save(DeliveryRequestDto req) {
+    @KafkaListener(topics = "delivery-request-topic", id = "delivery")
+    public void save(KafkaStatus<KafkaDeliveryRequestDto> kafkaStatus) {
+        log.info("delivery request received~");
+        if (kafkaStatus.status().equals("assign")) {
         List<RiderTransportation> transportations = new ArrayList<>();
-        if (req.distanceFromStoreToCustomer() < 1) {
+        // 가게 ~ 고객 거리 < 1km 일 때, 모든 종류의 이동수단 가능
+        if (kafkaStatus.data().distanceFromStoreToCustomer() < 1) {
             transportations.addAll(Arrays.asList(
                     RiderTransportation.WALK,
                     RiderTransportation.BICYCLE,
                     RiderTransportation.MOTORBIKE,
                     RiderTransportation.CAR));
-        } else if (req.distanceFromStoreToCustomer() < 2.5) {
+        // 1km <= 가게 ~ 고객 거리 < 2.5km 일 때, 도보 빼고 전부 가능
+        } else if (kafkaStatus.data().distanceFromStoreToCustomer() < 2.5) {
             transportations.addAll(Arrays.asList(
                     RiderTransportation.BICYCLE,
                     RiderTransportation.MOTORBIKE,
                     RiderTransportation.CAR));
+        // 가게 ~ 고객 거리 >= 2.5km 일 때, 오토바이, 자동차만 가능
         } else {
             transportations.addAll(Arrays.asList(
                     RiderTransportation.MOTORBIKE,
                     RiderTransportation.CAR));
         }
-        DeliveryRequest deliveryRequest = req.toEntity(transportations);
-        deliveryRequestRepository.save(deliveryRequest);
-    }
-
-    @Override
-    public List<DeliveryRequest> getAll() {
-        return deliveryRequestRepository.findAll();
+            DeliveryRequest deliveryRequest = kafkaStatus.data().toEntity(transportations);
+            deliveryRequestRepository.save(deliveryRequest);
+        }
     }
 }

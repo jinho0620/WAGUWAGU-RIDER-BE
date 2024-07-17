@@ -9,6 +9,8 @@ import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
+import org.springframework.kafka.support.converter.JsonMessageConverter;
+import org.springframework.kafka.support.converter.RecordMessageConverter;
 
 @SpringBootApplication
 public class WaguwaguApplication {
@@ -26,4 +28,8 @@ public class WaguwaguApplication {
 //
 //		return template;
 //	}
+	@Bean
+	public RecordMessageConverter converter(){
+		return new JsonMessageConverter();
+	}
 }
