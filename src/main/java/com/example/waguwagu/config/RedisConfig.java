@@ -21,5 +21,6 @@ public class RedisConfig {
         geoTemplate.setValueSerializer(new Jackson2JsonRedisSerializer<>(new ObjectMapper(), DeliveryRequest.class));
         geoTemplate.afterPropertiesSet();
         return geoTemplate;
+
     }
 }
