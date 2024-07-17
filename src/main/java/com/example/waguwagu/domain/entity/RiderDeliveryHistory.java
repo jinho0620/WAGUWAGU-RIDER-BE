@@ -1,10 +1,7 @@
 package com.example.waguwagu.domain.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
@@ -32,4 +29,8 @@ public class RiderDeliveryHistory {
     @ManyToOne
     @JoinColumn(name = "RIDER_ID")
     private Rider rider;
+
+    @Setter
+    @Column(name = "RIDER_DELIVERY_HISTORY_IS_DELETED")
+    private boolean riderDeliveryHistoryIsDeleted;
 }
