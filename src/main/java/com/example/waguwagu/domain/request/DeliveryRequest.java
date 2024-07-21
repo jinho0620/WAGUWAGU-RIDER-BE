@@ -1,14 +1,13 @@
-package com.example.waguwagu.kafka.dto;
+package com.example.waguwagu.domain.request;
 
 import com.example.waguwagu.domain.entity.DeliveryRequest;
 import com.example.waguwagu.domain.type.RiderTransportation;
-import lombok.ToString;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
-public record KafkaDeliveryRequestDto(
-        Long orderId,
+public record DeliveryRequestDto(
+        Long orderId, // 주문 고유 번호
         String storeName, // 가게 이름
         String storeAddress, // 가게 주소
         int deliveryFee, // 배달료
@@ -17,6 +16,7 @@ public record KafkaDeliveryRequestDto(
         double storeLatitude, // 가게 위도
         LocalDateTime due // 배달 몇 시까지 해야 하는지?
 ) {
+
     public DeliveryRequest toEntity(List<RiderTransportation> transportations) {
         DeliveryRequest deliveryRequest = DeliveryRequest.builder()
                 .orderId(orderId)
