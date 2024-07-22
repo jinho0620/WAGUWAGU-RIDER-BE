@@ -1,31 +1,30 @@
 package com.example.waguwagu.controller;
 
-import com.example.waguwagu.domain.request.DurationForHistoryDto;
-import com.example.waguwagu.domain.request.RiderDeliveryHistoryRequestDto;
-import com.example.waguwagu.domain.response.RiderDeliveryHistoryResponseDto;
+import com.example.waguwagu.domain.request.DurationForHistoryRequest;
+import com.example.waguwagu.domain.request.RiderDeliveryHistoryRequest;
+import com.example.waguwagu.domain.response.RiderDeliveryHistoryResponse;
 import com.example.waguwagu.service.RiderDeliveryHistoryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.UUID;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/deliveryHistories")
+@RequestMapping("/api/v1/delivery-histories")
 public class RiderDeliveryHistoryController {
     private final RiderDeliveryHistoryService riderDeliveryHistoryService;
 
-    @PostMapping("/{riderId}")
+    @PostMapping("/riders/{riderId}")
     @ResponseStatus(HttpStatus.CREATED)
-    public void saveDeliveryHistory(@PathVariable Long riderId, @RequestBody RiderDeliveryHistoryRequestDto req) {
+    public void saveDeliveryHistory(@PathVariable Long riderId, @RequestBody RiderDeliveryHistoryRequest req) {
         riderDeliveryHistoryService.saveDeliveryHistory(riderId, req);
     }
 
-    @GetMapping("/{riderId}")
-    public List<RiderDeliveryHistoryResponseDto> getDeliveryHistories(@PathVariable Long riderId,
-                                                                      DurationForHistoryDto dto) {
+    @GetMapping("/riders/{riderId}")
+    public List<RiderDeliveryHistoryResponse> getDeliveryHistories(@PathVariable Long riderId,
+                                                                   DurationForHistoryRequest dto) {
         return riderDeliveryHistoryService.getDeliveryHistories(riderId, dto);
     }
 }

@@ -4,14 +4,14 @@ import com.example.waguwagu.domain.entity.RiderDeliveryHistory;
 
 import java.time.LocalDateTime;
 
-public record RiderDeliveryHistoryResponseDto(
+public record RiderDeliveryHistoryResponse(
         Long riderDeliveryHistoryId,
         int riderIncome,
         LocalDateTime riderIncomeCreatedAt,
         String riderStoreName
 ) {
-    public static RiderDeliveryHistoryResponseDto from(RiderDeliveryHistory history) {
-        RiderDeliveryHistoryResponseDto dto = new RiderDeliveryHistoryResponseDto(
+    public static RiderDeliveryHistoryResponse from(RiderDeliveryHistory history) {
+        RiderDeliveryHistoryResponse dto = new RiderDeliveryHistoryResponse(
                 history.getRiderDeliveryHistoryId(),
                 history.getRiderIncome(),
                 history.getRiderIncomeCreatedAt(),

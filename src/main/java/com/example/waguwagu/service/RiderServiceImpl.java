@@ -1,7 +1,8 @@
 package com.example.waguwagu.service;
 
 import com.example.waguwagu.domain.entity.Rider;
-import com.example.waguwagu.domain.request.RiderUpdateDto;
+import com.example.waguwagu.domain.request.ChangeActivationStateRequest;
+import com.example.waguwagu.domain.request.RiderUpdateRequest;
 import com.example.waguwagu.global.dao.RiderDao;
 import com.example.waguwagu.kafka.KafkaStatus;
 import jakarta.transaction.Transactional;
@@ -17,15 +18,20 @@ public class RiderServiceImpl implements RiderService {
     private final RiderDao riderDao;
 
 
-    @KafkaListener(topics = "rider-topic", id = "rider")
-    public void saveRider(KafkaStatus<Rider> kafkaStatus) {
-        log.info("Rider data Received~");
-        if (kafkaStatus.status().equals("insert")) riderDao.save(kafkaStatus.data());
+//    @KafkaListener(topics = "rider-topic", id = "rider")
+//    public void saveRider(KafkaStatus<Rider> kafkaStatus) {
+//        log.info("Rider data Received~");
+//        if (kafkaStatus.status().equals("insert")) riderDao.save(kafkaStatus.data());
+//    }
+
+    public void saveRider(Rider rider) {
+//        log.info("Rider data Received~");
+        riderDao.save(rider);
     }
 
     @Override
     @Transactional
-    public void updateRider(Long id, RiderUpdateDto req) {
+    public void updateRider(Long id, RiderUpdateRequest req) {
         Rider rider = riderDao.findById(id);
         rider.setRiderEmail(req.riderEmail());
         rider.setRiderNickname(req.riderNickname());
@@ -50,8 +56,8 @@ public class RiderServiceImpl implements RiderService {
 
     @Override
     @Transactional
-    public void changeActivationState(Long id) {
+    public void changeActivationState(Long id, ChangeActivationStateRequest req) {
         Rider rider = riderDao.findById(id);
-        rider.setRiderIsActive(!rider.isRiderIsActive());
+        rider.setRiderIsActive(req.onOff().equals("on"));
     }
 }

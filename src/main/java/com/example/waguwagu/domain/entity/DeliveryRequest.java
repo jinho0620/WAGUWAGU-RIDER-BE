@@ -8,6 +8,7 @@ import org.springframework.data.redis.core.RedisHash;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 
 @Getter
 @AllArgsConstructor
@@ -19,7 +20,7 @@ import java.util.List;
 // 주문 도메인으로 부터 kafka를 통해 받을 데이터
 public class DeliveryRequest {
     @Id
-    private Long id;
+    private UUID id;
     private Long orderId;
     private String storeName; // 가게 이름
     private String storeAddress; // 가게 주소

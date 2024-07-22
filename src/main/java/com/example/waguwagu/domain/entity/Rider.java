@@ -1,6 +1,7 @@
 package com.example.waguwagu.domain.entity;
 
 import com.example.waguwagu.domain.type.RiderTransportation;
+import com.example.waguwagu.domain.type.RiderUpdateType;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -52,4 +53,6 @@ public class Rider {
     @Setter
     @Column(name = "RIDER_IS_DELETED")
     private boolean riderIsDeleted;
+
+//
 }
