@@ -4,9 +4,8 @@ import com.example.waguwagu.domain.entity.Rider;
 import com.example.waguwagu.domain.entity.RiderDeliveryHistory;
 
 import java.time.LocalDateTime;
-import java.util.UUID;
 
-public record RiderDeliveryHistoryRequestDto(
+public record RiderDeliveryHistoryRequest(
         int riderIncome,
         String riderStoreName
 ) {

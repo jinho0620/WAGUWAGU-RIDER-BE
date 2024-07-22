@@ -1,7 +1,8 @@
 package com.example.waguwagu.controller;
 
 import com.example.waguwagu.domain.entity.Rider;
-import com.example.waguwagu.domain.request.RiderUpdateDto;
+import com.example.waguwagu.domain.request.ChangeActivationStateRequest;
+import com.example.waguwagu.domain.request.RiderUpdateRequest;
 import com.example.waguwagu.service.RiderService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -10,18 +11,18 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
-    @RequestMapping("/api/v1/riders")
+@RequestMapping("/api/v1/riders")
 public class RiderController {
     private final RiderService riderService;
     // kafka로 rider 객체 받음
 
-//    @PostMapping
-//    @ResponseStatus(HttpStatus.CREATED)
-//    public void saveRider(@RequestBody Rider rider) {
-//        riderService.saveRider(rider);
-//    }
+    @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
+    public void saveRider(@RequestBody Rider rider) {
+        riderService.saveRider(rider);
+    }
     @PutMapping("/{id}")
-    public void updateRider(@PathVariable Long id, @RequestBody RiderUpdateDto req) {
+    public void updateRider(@PathVariable Long id, @RequestBody RiderUpdateRequest req) {
         riderService.updateRider(id, req);
     }
 
@@ -36,7 +37,7 @@ public class RiderController {
     }
 
     @PutMapping("/{id}/activation")
-    public void changeActivationState(@PathVariable Long id) {
-        riderService.changeActivationState(id);
+    public void changeActivationState(@PathVariable Long id, @RequestBody ChangeActivationStateRequest req) {
+        riderService.changeActivationState(id, req);
     }
 }

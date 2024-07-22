@@ -1,5 +1,5 @@
 package com.example.waguwagu.domain.type;
 
-public enum RiderTransportation {
-    WALK, BICYCLE, MOTORBIKE, CAR
+public enum RiderUpdateType {
+    EMAIL, NICKNAME, PHONE_NUMBER, ACTIVITY_AREA, TRANSPORTATION, ACCOUNT
 }

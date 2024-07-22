@@ -1,5 +1,5 @@
 package com.example.waguwagu.domain.request;
-public record RiderAssignRequestDto(
+public record RiderAssignRequest(
         double longitude,
         double latitude
 ) {

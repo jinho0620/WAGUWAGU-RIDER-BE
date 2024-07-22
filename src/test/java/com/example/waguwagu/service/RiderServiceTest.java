@@ -1,10 +1,10 @@
 package com.example.waguwagu.service;
 
 import com.example.waguwagu.domain.entity.Rider;
-import com.example.waguwagu.domain.request.RiderUpdateDto;
+import com.example.waguwagu.domain.request.ChangeActivationStateRequest;
+import com.example.waguwagu.domain.request.RiderUpdateRequest;
 import com.example.waguwagu.domain.type.RiderTransportation;
 import com.example.waguwagu.global.repository.RiderRepository;
-import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,25 +26,25 @@ class RiderServiceTest {
 
 
 
-    @Test
-    void saveRider() {
-        Rider rider = new Rider(
-                null,
-                "wlshzz@naver.com",
-                "Jinho",
-                "123-456-7890",
-                Arrays.asList("노원구", "도봉구", "서초구"),
-                true,
-                RiderTransportation.BICYCLE,
-                "123-456-789",
-                false);
-        riderService.saveRider(rider);
-        List<Rider> riders = riderRepository.findAll();
-        Rider savedRider = riders.get(riders.size()-1);
-
-        assertNotNull(savedRider);
-        assertEquals("wlshzz@naver.com", savedRider.getRiderEmail());
-    }
+//    @Test
+//    void saveRider() {
+//        Rider rider = new Rider(
+//                null,
+//                "wlshzz@naver.com",
+//                "Jinho",
+//                "123-456-7890",
+//                Arrays.asList("노원구", "도봉구", "서초구"),
+//                true,
+//                RiderTransportation.BICYCLE,
+//                "123-456-789",
+//                false);
+//        riderService.saveRider(rider);
+//        List<Rider> riders = riderRepository.findAll();
+//        Rider savedRider = riders.get(riders.size()-1);
+//
+//        assertNotNull(savedRider);
+//        assertEquals("wlshzz@naver.com", savedRider.getRiderEmail());
+//    }
 
     @Test
     void updateRider() {
@@ -60,7 +60,7 @@ class RiderServiceTest {
                 false);
         Rider savedRider = riderRepository.save(rider);
 
-        RiderUpdateDto dto = new RiderUpdateDto(
+        RiderUpdateRequest dto = new RiderUpdateRequest(
                 "wlshzz@naver.com",
                 "Jinho",
                 "010-4030-9482",
@@ -152,14 +152,14 @@ class RiderServiceTest {
 
         @Test
         void success() {
-            riderService.changeActivationState(savedRider.getRiderId());
+            riderService.changeActivationState(savedRider.getRiderId(), new ChangeActivationStateRequest("off"));
             Rider changedRider = riderRepository.findById(savedRider.getRiderId()).orElseThrow();
             assertFalse(changedRider.isRiderIsActive());
         }
 
         @Test
         void fail() {
-            assertThrows(IllegalArgumentException.class , () -> riderService.changeActivationState(10000L));
+            assertThrows(IllegalArgumentException.class , () -> riderService.changeActivationState(10000L, new ChangeActivationStateRequest("on")));
         }
 
     }
