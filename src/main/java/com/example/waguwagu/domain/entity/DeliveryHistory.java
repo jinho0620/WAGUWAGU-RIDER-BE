@@ -1,14 +1,10 @@
 package com.example.waguwagu.domain.entity;
 
-import com.example.waguwagu.domain.type.RiderTransportation;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDateTime;
-import java.util.List;
+import java.util.UUID;
 
 @Entity
 @Builder
@@ -19,10 +15,28 @@ import java.util.List;
 public class DeliveryHistory {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-    private Long orderId;
-    private String storeName; // 가게 이름
-    private int deliveryPay; // 배달 수당
+    @Column(name = "DELIVERY_HISTORY_ID")
+    private Long deliveryHistoryId;
+
+    @Column(name = "DELIVERY_INCOME")
+    private int deliveryIncome;
+
+    @Column(name = "STORE_NAME")
+    private String storeName;
+
+    @Column(name = "ORDER_ID")
+    private UUID orderId;
+
     @Builder.Default
-    private LocalDateTime createdAt = LocalDateTime.now();
+    @Column(name = "DELIVERY_INCOME_CREATED_AT")
+    private LocalDateTime deliveryIncomeCreatedAt = LocalDateTime.now();
+
+    @ManyToOne
+    @JoinColumn(name = "RIDER_ID")
+    private Rider rider;
+
+    @Setter
+    @Column(name = "DELIVERY_HISTORY_IS_DELETED")
+    @Builder.Default
+    private boolean deliveryHistoryIsDeleted = false;
 }

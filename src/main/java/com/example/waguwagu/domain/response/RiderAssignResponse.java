@@ -5,7 +5,7 @@ import java.util.UUID;
 
 public record RiderAssignResponse(
         UUID deliveryRequestId,
-        Long orderId,
+        UUID orderId,
         String storeName,
         String storeAddress,
         int deliveryPay,
