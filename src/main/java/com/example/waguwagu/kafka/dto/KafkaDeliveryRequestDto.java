@@ -1,12 +1,13 @@
-package com.example.waguwagu.domain.request;
+package com.example.waguwagu.kafka.dto;
 
 import com.example.waguwagu.domain.type.RiderTransportation;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 
-public record DeliveryRequestFromKafka(
-        Long orderId, // 주문 고유 번호
+public record KafkaDeliveryRequestDto(
+        UUID orderId, // 주문 고유 번호
         String storeName, // 가게 이름
         String storeAddress, // 가게 주소
         int deliveryFee, // 배달료
@@ -21,7 +22,6 @@ public record DeliveryRequestFromKafka(
                 .orderId(orderId)
                 .storeName(storeName)
                 .storeAddress(storeAddress)
-                .deliveryPay(deliveryFee)
                 .distanceFromStoreToCustomer(distanceFromStoreToCustomer)
                 .storeLongitude(storeLongitude)
                 .storeLatitude(storeLatitude)
@@ -30,5 +30,19 @@ public record DeliveryRequestFromKafka(
                 .due(due)
                 .build();
         return deliveryRequest;
+    }
+
+    @Override
+    public String toString() {
+        return "KafkaDeliveryRequestDto{" +
+                "orderId=" + orderId +
+                ", storeName='" + storeName + '\'' +
+                ", storeAddress='" + storeAddress + '\'' +
+                ", deliveryFee=" + deliveryFee +
+                ", distanceFromStoreToCustomer=" + distanceFromStoreToCustomer +
+                ", storeLongitude=" + storeLongitude +
+                ", storeLatitude=" + storeLatitude +
+                ", due=" + due +
+                '}';
     }
 }

@@ -16,24 +16,15 @@ public class RiderController {
     private final RiderService riderService;
     // kafka로 rider 객체 받음
 
-    @PostMapping
-    @ResponseStatus(HttpStatus.CREATED)
-    public void saveRider(@RequestBody Rider rider) {
-        riderService.saveRider(rider);
-    }
-    @PutMapping("/{id}")
-    public void updateRider(@PathVariable Long id, @RequestBody RiderUpdateRequest req) {
-        riderService.updateRider(id, req);
-    }
+//    @PostMapping
+//    @ResponseStatus(HttpStatus.CREATED)
+//    public void saveRider(@RequestBody Rider rider) {
+//        riderService.saveRider(rider);
+//    }
 
     @GetMapping("/{id}")
     public Rider getById(@PathVariable Long id) {
         return riderService.getById(id);
-    }
-
-    @DeleteMapping("/{id}")
-    public void deleteById(@PathVariable Long id) {
-        riderService.deleteById(id);
     }
 
     @PutMapping("/{id}/activation")
