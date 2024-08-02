@@ -3,8 +3,8 @@ package com.example.waguwagu.domain.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.UUID;
 
 @Entity
 @Builder
@@ -18,18 +18,9 @@ public class DeliveryHistory {
     @Column(name = "DELIVERY_HISTORY_ID")
     private Long deliveryHistoryId;
 
-    @Column(name = "DELIVERY_INCOME")
-    private int deliveryIncome;
-
-    @Column(name = "STORE_NAME")
-    private String storeName;
-
-    @Column(name = "ORDER_ID")
-    private UUID orderId;
-
     @Builder.Default
-    @Column(name = "DELIVERY_INCOME_CREATED_AT")
-    private LocalDateTime deliveryIncomeCreatedAt = LocalDateTime.now();
+    @Column(name = "DELIVERY_HISTORY_CREATED_AT")
+    private LocalDate deliveryHistoryCreatedAt = LocalDate.now();
 
     @ManyToOne
     @JoinColumn(name = "RIDER_ID")

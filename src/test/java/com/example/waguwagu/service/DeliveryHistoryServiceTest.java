@@ -1,23 +1,23 @@
 package com.example.waguwagu.service;
 
 import com.example.waguwagu.domain.entity.DeliveryHistory;
-import com.example.waguwagu.domain.request.DurationForHistoryRequest;
-import com.example.waguwagu.domain.request.DeliveryHistoryRequest;
 import com.example.waguwagu.domain.response.DeliveryHistoryResponse;
 import com.example.waguwagu.domain.type.RiderTransportation;
 import com.example.waguwagu.global.dao.RiderDao;
+import com.example.waguwagu.global.exception.DeliveryHistoryNotFoundException;
 import com.example.waguwagu.global.repository.DeliveryHistoryRepository;
 import com.example.waguwagu.kafka.dto.KafkaRiderDto;
 import com.example.waguwagu.kafka.KafkaStatus;
+import jakarta.transaction.Transactional;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
-import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -26,16 +26,14 @@ class DeliveryHistoryServiceTest {
     @Autowired
     private DeliveryHistoryService deliveryHistoryService;
     @Autowired
-    private RiderDao riderDao;
-    @Autowired
     private DeliveryHistoryRepository deliveryHistoryRepository;
     @Autowired
     private RiderServiceImpl riderServiceImpl;
 
-    @Test
-    void saveDeliveryHistory() {
+    @BeforeEach
+    void init() {
         KafkaStatus<KafkaRiderDto> kafkaStatus = new KafkaStatus<>(
-                new KafkaRiderDto(10000L,
+                new KafkaRiderDto(200L,
                         "wlshzz@naver.com",
                         "Jinho",
                         "123-456-7890",
@@ -44,42 +42,64 @@ class DeliveryHistoryServiceTest {
                         "123-456-789",
                         false), "insert");
         riderServiceImpl.saveRider(kafkaStatus);
-        DeliveryHistoryRequest dto = new DeliveryHistoryRequest(
-                3000, "담미옥", UUID.fromString("0a12dfd9-8243-468b-9330-1d7cefc70a14"));
-        deliveryHistoryService.saveDeliveryHistory(10000L, dto);
+    }
 
-        List<DeliveryHistory> histories = deliveryHistoryRepository.findAll();
-        DeliveryHistory lastHistory = histories.get(histories.size()-1);
+    @Test
+    @DisplayName("Success : should return input rider id when saved")
+    @Transactional
+    void saveDeliveryHistory() {
+        Long deliveryHistoryId = deliveryHistoryService.saveDeliveryHistory(200L);
+        DeliveryHistory savedHistory = deliveryHistoryRepository.findById(deliveryHistoryId).orElseThrow(DeliveryHistoryNotFoundException::new);
 
-        assertNotNull(lastHistory);
-        assertEquals("담미옥", lastHistory.getStoreName());
+        assertNotNull(savedHistory);
+        assertEquals(200L, savedHistory.getRider().getRiderId());
     }
 
     @Nested
+    @DisplayName("Fetch delivery histories by rider id")
     class getDeliveryHistories {
         @Test
+        @DisplayName("Success : should fetch delivery histories")
+        @Transactional
         void success() {
-            DurationForHistoryRequest durationForHistoryRequest = new DurationForHistoryRequest(
-                    LocalDate.now(),
-                    LocalDate.now().plusDays(1));
-            List<DeliveryHistoryResponse> histories = deliveryHistoryService
-                    .getDeliveryHistories(10000L, durationForHistoryRequest);
+            Long deliveryHistoryId = deliveryHistoryService.saveDeliveryHistory(200L);
+            List<DeliveryHistoryResponse> res = deliveryHistoryService.getDeliveryHistories(200L);
 
-            String storeName = histories.get(histories.size()-1).storeName();
-
-            assertNotNull(histories);
-            assertEquals("담미옥", storeName);
+            assertNotNull(res);
+            assertNotEquals(0, res.size());
+            assertEquals(deliveryHistoryId, res.get(res.size()-1).deliveryHistoryId());
         }
         @Test
-        void success_empty_in_this_duration() {
-            DurationForHistoryRequest durationForHistoryRequest = new DurationForHistoryRequest(
-                    LocalDate.now().minusDays(7),
-                    LocalDate.now().minusDays(4));
+        @DisplayName("Success : should return empty list when delivery history doesn't exist")
+        @Transactional
+        void success_empty_history() {
+            List<DeliveryHistoryResponse> res = deliveryHistoryService.getDeliveryHistories(200L);
 
-            List<DeliveryHistoryResponse> histories = deliveryHistoryService
-                    .getDeliveryHistories(10000L, durationForHistoryRequest);
-
-            assertEquals(0, histories.size());
+            assertNotNull(res);
+            assertEquals(0, res.size());
         }
     }
+
+    @Nested
+    @DisplayName("Fetch delivery histories by id")
+    class getById {
+        @Test
+        @DisplayName("Success : should fetch delivery histories")
+        @Transactional
+        void success() {
+            Long deliveryHistoryId = deliveryHistoryService.saveDeliveryHistory(200L);
+            DeliveryHistory deliveryHistory = deliveryHistoryService.getById(deliveryHistoryId);
+
+            assertNotNull(deliveryHistory);
+            assertEquals(200L, deliveryHistory.getRider().getRiderId());
+        }
+        @Test
+        @DisplayName("Fail : should throw exception when delivery history doesn't exist")
+        @Transactional
+        void fail() {
+            assertThrows(DeliveryHistoryNotFoundException.class, () -> deliveryHistoryService.getById(10000000L));
+        }
+    }
+
+
 }
