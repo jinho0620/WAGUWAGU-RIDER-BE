@@ -1,11 +1,11 @@
 package com.example.waguwagu.domain.entity;
 
 import com.example.waguwagu.domain.type.RiderTransportation;
+import com.example.waguwagu.kafka.dto.KafkaRiderDto;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.util.List;
-import java.util.UUID;
 
 @Entity
 @Builder
@@ -13,43 +13,48 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "RIDERS")
+@ToString
 public class Rider {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "RIDER_ID")
     private Long riderId;
 
-    @Setter
     @Column(name = "RIDER_EMAIL")
     private String riderEmail;
 
-    @Setter
     @Column(name = "RIDER_NICKNAME")
     private String riderNickname;
 
-    @Setter
     @Column(name = "RIDER_PHONE_NUMBER")
     private String riderPhoneNumber;
 
-    @Setter
     @Column(name = "RIDER_ACTIVITY_AREA")
     private List<String> riderActivityArea;
 
-    @Setter
     @Column(name = "RIDER_IS_ACTIVE")
-    private boolean riderIsActive;
-
+    @Builder.Default
     @Setter
+    private boolean riderIsActive = false;
+
     @Column(name = "RIDER_TRANSPORTATION")
     @Enumerated(EnumType.STRING)
     private RiderTransportation riderTransportation;
 
-    @Setter
     @Column(name = "RIDER_ACCOUNT")
     private String riderAccount;
 
 //    @OneToMany(mappedBy = "rider", cascade = CascadeType.ALL)
-    @Setter
     @Column(name = "RIDER_IS_DELETED")
-    private boolean riderIsDeleted;
+    @Builder.Default
+    private boolean riderIsDeleted = false;
+
+    public void update(KafkaRiderDto dto) {
+        if (!dto.riderEmail().equals(this.riderEmail)) this.riderEmail = dto.riderEmail();
+        if (!dto.riderNickname().equals(this.riderNickname)) this.riderNickname = dto.riderNickname();
+        if (!dto.riderPhoneNumber().equals(this.riderPhoneNumber)) this.riderPhoneNumber = dto.riderPhoneNumber();
+        if (!dto.riderActivityArea().equals(this.riderActivityArea)) this.riderActivityArea = dto.riderActivityArea();
+        if (!dto.riderTransportation().equals(this.riderTransportation)) this.riderTransportation = dto.riderTransportation();
+        if (!dto.riderAccount().equals(this.riderAccount)) this.riderAccount = dto.riderAccount();
+        if (this.riderIsDeleted != dto.riderIsDeleted()) this.riderIsDeleted = dto.riderIsDeleted();
+    }
 }

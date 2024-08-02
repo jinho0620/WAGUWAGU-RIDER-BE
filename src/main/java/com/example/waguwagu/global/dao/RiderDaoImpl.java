@@ -3,6 +3,8 @@ package com.example.waguwagu.global.dao;
 import com.example.waguwagu.domain.entity.Rider;
 import com.example.waguwagu.global.exception.RiderNotFoundException;
 import com.example.waguwagu.global.repository.RiderRepository;
+import com.example.waguwagu.kafka.dto.KafkaRiderDto;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -18,7 +20,16 @@ public class RiderDaoImpl implements RiderDao {
     }
 
     @Override
-    public void save(Rider rider) {
-        riderRepository.save(rider);
+    public void save(KafkaRiderDto dto) {
+        riderRepository.save(dto.toEntity());
+    }
+
+    @Override
+    @Transactional
+    public void update(KafkaRiderDto dto) {
+        Rider riderById = riderRepository.findByRiderIdAndRiderIsDeletedFalse(dto.riderId())
+                .orElseThrow(RiderNotFoundException::new);
+        System.out.println(riderById);
+        riderById.update(dto);
     }
 }

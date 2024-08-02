@@ -1,99 +1,79 @@
 package com.example.waguwagu.service;
 
 import com.example.waguwagu.domain.entity.Rider;
-import com.example.waguwagu.domain.request.RiderUpdateDto;
+import com.example.waguwagu.domain.request.ChangeActivationStateRequest;
 import com.example.waguwagu.domain.type.RiderTransportation;
-import com.example.waguwagu.global.repository.RiderRepository;
+import com.example.waguwagu.global.dao.RiderDao;
+import com.example.waguwagu.global.exception.RiderNotFoundException;
+import com.example.waguwagu.kafka.dto.KafkaRiderDto;
+import com.example.waguwagu.kafka.KafkaStatus;
 import jakarta.transaction.Transactional;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.Arrays;
-import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 class RiderServiceTest {
     @Autowired
-    private RiderService riderService;
+    private RiderServiceImpl riderServiceImpl;
 
     @Autowired
-    private RiderRepository riderRepository;
+    private RiderDao riderDao;
 
-
-
+    @BeforeEach
+    void initRider() {
+        KafkaStatus<KafkaRiderDto> kafkaStatus = new KafkaStatus<>(
+                new KafkaRiderDto(1000L,
+                        "wlshzz@naver.com",
+                        "Jinho",
+                        "123-456-7890",
+                        Arrays.asList("노원구", "도봉구", "서초구"),
+                        RiderTransportation.BICYCLE,
+                        "123-456-789",
+                        false), "insert");
+        riderServiceImpl.saveRider(kafkaStatus);
+    }
 
     @Test
     void saveRider() {
-        Rider rider = new Rider(
-                null,
-                "wlshzz@naver.com",
-                "Jinho",
-                "123-456-7890",
-                Arrays.asList("노원구", "도봉구", "서초구"),
-                true,
-                RiderTransportation.BICYCLE,
-                "123-456-789",
-                false);
-        riderService.saveRider(rider);
-        List<Rider> riders = riderRepository.findAll();
-        Rider savedRider = riders.get(riders.size()-1);
-
+        Rider savedRider = riderDao.findById(1000L);
         assertNotNull(savedRider);
         assertEquals("wlshzz@naver.com", savedRider.getRiderEmail());
     }
 
     @Test
     void updateRider() {
-        Rider rider = new Rider(
-                null,
-                "wlshzz@naver.com",
-                "Jinho",
-                "123-456-7890",
-                Arrays.asList("노원구", "도봉구", "서초구"),
-                true,
-                RiderTransportation.BICYCLE,
-                "123-456-789",
-                false);
-        Rider savedRider = riderRepository.save(rider);
+        KafkaStatus<KafkaRiderDto> kafkaStatus = new KafkaStatus<>(
+                new KafkaRiderDto(1000L,
+                        "wlshzz@naver.com",
+                        "Jinho",
+                        "010-4030-9482",
+                        Arrays.asList("노원구", "강북구", "서초구", "강남구"),
+                        RiderTransportation.MOTORBIKE,
+                        "123-456-789",
+                        false), "update");
 
-        RiderUpdateDto dto = new RiderUpdateDto(
-                "wlshzz@naver.com",
-                "Jinho",
-                "010-4030-9482",
-                Arrays.asList("노원구", "도봉구", "서초구"),
-                RiderTransportation.BICYCLE,
-                "123-456-789"
-                );
-
-        riderService.updateRider(savedRider.getRiderId(), dto);
-
-        Rider updatedRider = riderRepository.findById(savedRider.getRiderId()).orElseThrow();
+        riderServiceImpl.updateRider(kafkaStatus);
+        Rider updatedRider = riderDao.findById(1000L);
 
         assertNotNull(updatedRider);
         assertEquals("010-4030-9482", updatedRider.getRiderPhoneNumber());
+        assertEquals(RiderTransportation.MOTORBIKE, updatedRider.getRiderTransportation());
     }
 
     @Nested
     class getById {
         @Test
         void success() {
-            Rider rider = new Rider(
-                    null,
-                    "wlshzz@naver.com",
-                    "Jinho",
-                    "123-456-7890",
-                    Arrays.asList("노원구", "도봉구", "서초구"),
-                    true,
-                    RiderTransportation.BICYCLE,
-                    "123-456-789",
-                    false);
-            Rider savedRider = riderRepository.save(rider);
+            Long riderId = 1000L;
 
-            Rider getRider = riderService.getById(savedRider.getRiderId());
+            Rider getRider = riderServiceImpl.getById(riderId);
 
             assertNotNull(getRider);
             assertEquals("wlshzz@naver.com", getRider.getRiderEmail());
@@ -101,65 +81,26 @@ class RiderServiceTest {
 
         @Test
         void fail() {
-            assertThrows(IllegalArgumentException.class , () -> riderService.getById(100000L));
+            assertThrows(RiderNotFoundException.class
+                    , () -> riderServiceImpl.getById(100000L));
         }
-
-
-
-
     }
 
-    @Nested
-    class deleteById {
-        Rider rider = new Rider(
-                null,
-                "wlshzz@naver.com",
-                "Jinho",
-                "123-456-7890",
-                Arrays.asList("노원구", "도봉구", "서초구"),
-                true,
-                RiderTransportation.BICYCLE,
-                "123-456-789",
-                false);
-        Rider savedRider = riderRepository.save(rider);
-        @Test
-        void success() {
-            riderService.deleteById(savedRider.getRiderId());
-            assertThrows(IllegalArgumentException.class , () -> riderService.deleteById(savedRider.getRiderId()));
-        }
-
-        @Test
-        void fail() {
-            assertThrows(IllegalArgumentException.class , () -> riderService.deleteById(100000L));
-        }
-
-
-    }
 
     @Nested
     class changeActivationState {
-        Rider rider = new Rider(
-                null,
-                "wlshzz@naver.com",
-                "Jinho",
-                "123-456-7890",
-                Arrays.asList("노원구", "도봉구", "서초구"),
-                true,
-                RiderTransportation.BICYCLE,
-                "123-456-789",
-                false);
-        Rider savedRider = riderRepository.save(rider);
-
         @Test
         void success() {
-            riderService.changeActivationState(savedRider.getRiderId());
-            Rider changedRider = riderRepository.findById(savedRider.getRiderId()).orElseThrow();
+            Long riderId = 1000L;
+            riderServiceImpl.changeActivationState(riderId, new ChangeActivationStateRequest("off"));
+            Rider changedRider = riderDao.findById(riderId);
             assertFalse(changedRider.isRiderIsActive());
         }
 
         @Test
         void fail() {
-            assertThrows(IllegalArgumentException.class , () -> riderService.changeActivationState(10000L));
+            assertThrows(RiderNotFoundException.class
+                    , () -> riderServiceImpl.changeActivationState(1000000L, new ChangeActivationStateRequest("on")));
         }
 
     }

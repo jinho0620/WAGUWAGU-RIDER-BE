@@ -1,16 +1,18 @@
 package com.example.waguwagu.service;
 
-import com.example.waguwagu.domain.entity.DeliveryRequest;
-import com.example.waguwagu.domain.request.RiderAssignRequestDto;
-import com.example.waguwagu.domain.response.RiderAssignResponseDto;
+import com.example.waguwagu.domain.request.RiderAssignRequest;
+import com.example.waguwagu.domain.response.RiderAssignResponse;
 
 import java.util.List;
+import java.util.UUID;
 
 public interface DeliveryRequestService {
 //    List<RiderAssignResponseDto> assignRider(Rider rider, RiderAssignRequestDto req);
-    List<RiderAssignResponseDto> assignRider(Long riderId, RiderAssignRequestDto req);
+    List<RiderAssignResponse> assignRider(Long riderId, RiderAssignRequest req);
 
-//    void save(DeliveryRequestDto req);
+//    void save(DeliveryRequestFromKafka dto);
 
 //    List<DeliveryRequest> getAll();
+    void deleteFromRedisAndSaveToDatabase(UUID id, Long riderId);
+    void deleteById(UUID id);
 }
