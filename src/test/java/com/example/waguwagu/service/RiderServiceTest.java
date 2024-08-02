@@ -8,6 +8,7 @@ import com.example.waguwagu.global.exception.RiderNotFoundException;
 import com.example.waguwagu.kafka.dto.KafkaRiderDto;
 import com.example.waguwagu.kafka.KafkaStatus;
 import jakarta.transaction.Transactional;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,10 +26,8 @@ class RiderServiceTest {
     @Autowired
     private RiderDao riderDao;
 
-
-    @Test
-    @Transactional
-    void saveRider() {
+    @BeforeEach
+    void initRider() {
         KafkaStatus<KafkaRiderDto> kafkaStatus = new KafkaStatus<>(
                 new KafkaRiderDto(1000L,
                         "wlshzz@naver.com",
@@ -39,8 +38,11 @@ class RiderServiceTest {
                         "123-456-789",
                         false), "insert");
         riderServiceImpl.saveRider(kafkaStatus);
-        Rider savedRider = riderDao.findById(1000L);
+    }
 
+    @Test
+    void saveRider() {
+        Rider savedRider = riderDao.findById(1000L);
         assertNotNull(savedRider);
         assertEquals("wlshzz@naver.com", savedRider.getRiderEmail());
     }

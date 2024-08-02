@@ -2,7 +2,7 @@ package com.example.waguwagu.service;
 
 import com.example.waguwagu.domain.entity.DeliveryRequest;
 import com.example.waguwagu.domain.entity.Rider;
-import com.example.waguwagu.domain.request.DeliveryHistoryRequest;
+import com.example.waguwagu.domain.request.DeliveryHistoryDetailRequest;
 
 import com.example.waguwagu.domain.request.RiderAssignRequest;
 import com.example.waguwagu.domain.response.RiderAssignResponse;
@@ -48,6 +48,7 @@ public class DeliveryRequestServiceImpl implements DeliveryRequestService {
     private final RiderService riderService;
     private final RedisTemplate<String, String> redisTemplate;
     private final DeliveryHistoryService deliveryHistoryService;
+    private final DeliveryHistoryDetailService deliveryHistoryDetailService;
 
     @Override
     public List<RiderAssignResponse> assignRider(Long riderId, RiderAssignRequest req) {
@@ -164,18 +165,18 @@ public class DeliveryRequestServiceImpl implements DeliveryRequestService {
 
     @Override
     public void deleteFromRedisAndSaveToDatabase(UUID id, Long riderId) {
-        System.out.println(riderId);
-        System.out.println("method 입장 완료");
         DeliveryRequest deliveryRequest = deliveryRequestRedisRepository.findById(id)
                 .orElseThrow(DeliveryRequestNotFoundException::new);
         System.out.println(deliveryRequest);
-        DeliveryHistoryRequest deliveryHistoryRequest = new DeliveryHistoryRequest(
+        Long deliveryHistoryId = deliveryHistoryService.saveDeliveryHistory(riderId);
+        System.out.println("배달 내역 생성 완료");
+        DeliveryHistoryDetailRequest req = new DeliveryHistoryDetailRequest(
                 deliveryRequest.getDeliveryPay(),
                 deliveryRequest.getStoreName(),
                 deliveryRequest.getOrderId()
         );
-        deliveryHistoryService.saveDeliveryHistory(riderId, deliveryHistoryRequest);
-        System.out.println("deliveryHistoryRequest 생성 완료");
+        deliveryHistoryDetailService.saveDeliveryHistoryDetail(deliveryHistoryId, req);
+        System.out.println("배달 상세 내역 생성 완료");
         deleteById(id);
         System.out.println("주문 건 레디스에서 삭제 완료");
     }
