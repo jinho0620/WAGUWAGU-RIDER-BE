@@ -14,7 +14,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-@RedisHash
+@RedisHash("DeliveryRequest")
 @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
 @ToString
 // 주문 도메인으로 부터 kafka를 통해 받을 데이터

@@ -49,6 +49,7 @@ public class DeliveryHistoryDetailServiceImpl implements DeliveryHistoryDetailSe
             totalIncome += detail.getDeliveryIncome();
         }
         DeliveryHistorySummaryResponse summary = new DeliveryHistorySummaryResponse(details.size(), totalIncome);
+        System.out.println(summary);
         return summary;
     }
 }

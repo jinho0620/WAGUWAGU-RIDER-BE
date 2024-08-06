@@ -19,6 +19,7 @@ public record KafkaDeliveryRequestDto(
 
     public com.example.waguwagu.domain.entity.DeliveryRequest toEntity(List<RiderTransportation> transportations) {
         com.example.waguwagu.domain.entity.DeliveryRequest deliveryRequest = com.example.waguwagu.domain.entity.DeliveryRequest.builder()
+                .id(orderId)
                 .orderId(orderId)
                 .storeName(storeName)
                 .storeAddress(storeAddress)
