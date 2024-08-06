@@ -6,4 +6,11 @@ public record DeliveryHistorySummaryResponse(
         int deliveryCount,
         int deliveryTotalIncome
 ) {
+    @Override
+    public String toString() {
+        return "DeliveryHistorySummaryResponse{" +
+                "deliveryCount=" + deliveryCount +
+                ", deliveryTotalIncome=" + deliveryTotalIncome +
+                '}';
+    }
 }

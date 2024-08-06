@@ -22,7 +22,7 @@ public class DeliveryHistoryDetail {
     private int deliveryIncome;
 
     @Builder.Default
-    @Column(name = "DELIVERY_HISTORY_DETAIL_CREATED_AT")
+    @Column(name = "DELIVERY_HISTORY_DETAIL_CREATED_AT", unique = true)
     private LocalDateTime deliveryHistoryDetailCreatedAt = LocalDateTime.now();
 
     @Column(name = "STORE_NAME")
