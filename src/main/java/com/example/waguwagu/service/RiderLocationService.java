@@ -9,4 +9,6 @@ public interface RiderLocationService {
     void saveRiderLocation(RiderLocationRequest req);
     RiderLocationResponse getByOrderId(UUID orderId);
     void deleteByOrderId(UUID orderId);
+
+
 }
