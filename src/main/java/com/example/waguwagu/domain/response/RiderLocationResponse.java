@@ -1,19 +1,20 @@
 package com.example.waguwagu.domain.response;
 
 import com.example.waguwagu.domain.entity.RiderLocation;
+import com.example.waguwagu.domain.type.RiderTransportation;
 
 import java.util.UUID;
 
 public record RiderLocationResponse(
-        UUID orderId,
         double riderLatitude,
-        double riderLongitude
+        double riderLongitude,
+        RiderTransportation riderTransportation
 ) {
-    public static RiderLocationResponse from(RiderLocation location) {
+    public static RiderLocationResponse from(RiderLocation location, RiderTransportation riderTransportation) {
         RiderLocationResponse res = new RiderLocationResponse(
-                location.getOrderId(),
                 location.getRiderLatitude(),
-                location.getRiderLongitude());
+                location.getRiderLongitude(),
+                riderTransportation);
         return res;
     }
 }

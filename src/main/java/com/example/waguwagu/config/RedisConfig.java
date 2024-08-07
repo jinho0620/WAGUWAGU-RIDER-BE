@@ -13,11 +13,9 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 @Configuration
 public class RedisConfig {
     @Bean
-    public RedisTemplate<String, String> redisTemplate() {
-        LettuceConnectionFactory connectionFactory = new LettuceConnectionFactory();
-        connectionFactory.afterPropertiesSet();
+    public RedisTemplate<String, String> redisTemplate(RedisConnectionFactory redisConnectionFactory) {
         RedisTemplate<String, String> geoTemplate = new RedisTemplate<>();
-        geoTemplate.setConnectionFactory(connectionFactory);
+        geoTemplate.setConnectionFactory(redisConnectionFactory);
         geoTemplate.setKeySerializer(new StringRedisSerializer());
         geoTemplate.setValueSerializer(new Jackson2JsonRedisSerializer<>(new ObjectMapper(), DeliveryRequest.class));
         geoTemplate.afterPropertiesSet();
@@ -25,3 +23,4 @@ public class RedisConfig {
 
     }
 }
+

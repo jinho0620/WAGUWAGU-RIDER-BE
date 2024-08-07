@@ -1,8 +1,10 @@
 package com.example.waguwagu.service;
 
+import com.example.waguwagu.domain.entity.Rider;
 import com.example.waguwagu.domain.entity.RiderLocation;
 import com.example.waguwagu.domain.request.RiderLocationRequest;
 import com.example.waguwagu.domain.response.RiderLocationResponse;
+import com.example.waguwagu.domain.type.RiderTransportation;
 import com.example.waguwagu.global.exception.RiderLocationNotFoundException;
 import com.example.waguwagu.global.repository.RiderLocationRedisRepository;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +18,7 @@ import java.util.UUID;
 @Slf4j
 public class RiderLocationServiceImpl implements RiderLocationService {
     private final RiderLocationRedisRepository riderLocationRedisRepository;
+    private final RiderService riderService;
 
     @Override
     public void saveRiderLocation(RiderLocationRequest req) {
@@ -28,7 +31,9 @@ public class RiderLocationServiceImpl implements RiderLocationService {
     public RiderLocationResponse getByOrderId(UUID orderId) {
         RiderLocation location = riderLocationRedisRepository.findById(orderId)
                 .orElseThrow(RiderLocationNotFoundException::new);
-        RiderLocationResponse res = RiderLocationResponse.from(location);
+        Rider rider = riderService.getById(location.getRiderId());
+        RiderTransportation riderTransportation = rider.getRiderTransportation();
+        RiderLocationResponse res = RiderLocationResponse.from(location, riderTransportation);
         return res;
     }
 
