@@ -1,9 +1,8 @@
 package com.example.waguwagu.service;
 
 import com.example.waguwagu.domain.entity.DeliveryHistory;
-import com.example.waguwagu.domain.response.DeliveryHistoryResponse;
+import com.example.waguwagu.domain.dto.response.DeliveryHistoryResponse;
 import com.example.waguwagu.domain.type.RiderTransportation;
-import com.example.waguwagu.global.dao.RiderDao;
 import com.example.waguwagu.global.exception.DeliveryHistoryNotFoundException;
 import com.example.waguwagu.global.repository.DeliveryHistoryRepository;
 import com.example.waguwagu.kafka.dto.KafkaRiderDto;

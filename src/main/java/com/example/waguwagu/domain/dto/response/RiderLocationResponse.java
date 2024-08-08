@@ -1,9 +1,7 @@
-package com.example.waguwagu.domain.response;
+package com.example.waguwagu.domain.dto.response;
 
 import com.example.waguwagu.domain.entity.RiderLocation;
 import com.example.waguwagu.domain.type.RiderTransportation;
-
-import java.util.UUID;
 
 public record RiderLocationResponse(
         double riderLatitude,

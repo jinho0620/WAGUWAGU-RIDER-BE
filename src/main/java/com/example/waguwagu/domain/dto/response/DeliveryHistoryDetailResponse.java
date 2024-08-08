@@ -1,4 +1,4 @@
-package com.example.waguwagu.domain.response;
+package com.example.waguwagu.domain.dto.response;
 
 import com.example.waguwagu.domain.entity.DeliveryHistoryDetail;
 

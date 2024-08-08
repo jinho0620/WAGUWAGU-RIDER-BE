@@ -1,6 +1,6 @@
 package com.example.waguwagu.service;
 import com.example.waguwagu.domain.entity.DeliveryHistory;
-import com.example.waguwagu.domain.response.DeliveryHistoryResponse;
+import com.example.waguwagu.domain.dto.response.DeliveryHistoryResponse;
 
 
 import java.util.List;

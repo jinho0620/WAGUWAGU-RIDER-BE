@@ -1,7 +1,7 @@
 package com.example.waguwagu.controller;
 
-import com.example.waguwagu.domain.request.RiderLocationRequest;
-import com.example.waguwagu.domain.response.RiderLocationResponse;
+import com.example.waguwagu.domain.dto.request.RiderLocationRequest;
+import com.example.waguwagu.domain.dto.response.RiderLocationResponse;
 import com.example.waguwagu.service.RiderLocationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;

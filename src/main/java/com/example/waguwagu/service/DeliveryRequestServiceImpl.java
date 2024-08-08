@@ -2,10 +2,9 @@ package com.example.waguwagu.service;
 
 import com.example.waguwagu.domain.entity.DeliveryRequest;
 import com.example.waguwagu.domain.entity.Rider;
-import com.example.waguwagu.domain.request.DeliveryHistoryDetailRequest;
 
-import com.example.waguwagu.domain.request.RiderAssignRequest;
-import com.example.waguwagu.domain.response.RiderAssignResponse;
+import com.example.waguwagu.domain.dto.request.RiderAssignRequest;
+import com.example.waguwagu.domain.dto.response.RiderAssignResponse;
 import com.example.waguwagu.domain.type.RiderTransportation;
 import com.example.waguwagu.global.exception.DeliveryRequestNotFoundException;
 import com.example.waguwagu.global.exception.RiderNotActiveException;
@@ -68,8 +67,8 @@ public class DeliveryRequestServiceImpl implements DeliveryRequestService {
             String[] storeAddress = deliveryRequest.getStoreAddress().split(" ");
             String storeDistrict = storeAddress[1];
 
-            // 가게가 내 활동 범위에 있는지, 배달 요청에 내 이동수단이 포함되는지 확인
-            if(rider.getRiderActivityArea().contains(storeDistrict)
+            // 가게가 내 활동 범위에 있는지, 배달 요청에 내 이동수단이 포함되는지 그리고 이미 라이더가 배정되었는지 검증
+            if(!deliveryRequest.isAssigned() && rider.getRiderActivityArea().contains(storeDistrict)
                     && deliveryRequest.getTransportations().contains(rider.getRiderTransportation())) {
                 // 맞다면 요청 목록에 추가
                 geoOperations.add(
@@ -99,11 +98,6 @@ public class DeliveryRequestServiceImpl implements DeliveryRequestService {
 //         요청 목록 return
         return list;
     }
-
-//    @Override
-//    public List<DeliveryRequest> getAll() {
-//        return deliveryRequestRepository.findAll();
-//    }
 
     @KafkaListener(topics = "order-topic", id = "delivery")
     public void save(KafkaStatus<KafkaDeliveryRequestDto> dto) {
@@ -136,55 +130,18 @@ public class DeliveryRequestServiceImpl implements DeliveryRequestService {
 
     }
 
-
-//    public void save(DeliveryRequestFromKafka dto) {
-//            log.info("delivery request received~");
-//            List<RiderTransportation> transportations = new ArrayList<>();
-//            // 가게 ~ 고객 거리 < 1km 일 때, 모든 종류의 이동수단 가능
-//            if (dto.distanceFromStoreToCustomer() < 1) {
-//                transportations.addAll(Arrays.asList(
-//                        RiderTransportation.WALK,
-//                        RiderTransportation.BICYCLE,
-//                        RiderTransportation.MOTORBIKE,
-//                        RiderTransportation.CAR));
-//                // 1km <= 가게 ~ 고객 거리 < 2.5km 일 때, 도보 빼고 전부 가능
-//            } else if (dto.distanceFromStoreToCustomer() < 2.5) {
-//                transportations.addAll(Arrays.asList(
-//                        RiderTransportation.BICYCLE,
-//                        RiderTransportation.MOTORBIKE,
-//                        RiderTransportation.CAR));
-//                // 가게 ~ 고객 거리 >= 2.5km 일 때, 오토바이, 자동차만 가능
-//            } else if (dto.distanceFromStoreToCustomer() <= 5){
-//                transportations.addAll(Arrays.asList(
-//                        RiderTransportation.MOTORBIKE,
-//                        RiderTransportation.CAR));
-//            }
-//            com.example.waguwagu.domain.entity.DeliveryRequest deliveryRequest = dto.toEntity(transportations);
-//            deliveryRequestRedisRepository.save(deliveryRequest);
-//    }
-
-    @Override
-    public void deleteFromRedisAndSaveToDatabase(UUID id, Long riderId) {
-        DeliveryRequest deliveryRequest = deliveryRequestRedisRepository.findById(id)
-                .orElseThrow(DeliveryRequestNotFoundException::new);
-        System.out.println(deliveryRequest);
-        Long deliveryHistoryId = deliveryHistoryService.saveDeliveryHistory(riderId);
-        System.out.println("배달 내역 생성 완료");
-        DeliveryHistoryDetailRequest req = new DeliveryHistoryDetailRequest(
-                deliveryRequest.getDeliveryPay(),
-                deliveryRequest.getStoreName(),
-                deliveryRequest.getOrderId()
-        );
-        deliveryHistoryDetailService.saveDeliveryHistoryDetail(deliveryHistoryId, req);
-        System.out.println("배달 상세 내역 생성 완료");
-        deleteById(id);
-        System.out.println("주문 건 레디스에서 삭제 완료");
-    }
-
     @Override
     public void deleteById(UUID id) {
         DeliveryRequest deliveryRequest = deliveryRequestRedisRepository.findById(id)
                 .orElseThrow(DeliveryRequestNotFoundException::new);
         deliveryRequestRedisRepository.deleteById(id);
+    }
+
+    @Override
+    public void updateRiderAssignedAsTrue(UUID id) {
+        DeliveryRequest deliveryRequest = deliveryRequestRedisRepository.findById(id)
+                .orElseThrow(DeliveryRequestNotFoundException::new);
+        deliveryRequest.setAssigned(true);
+        deliveryRequestRedisRepository.save(deliveryRequest);
     }
 }

@@ -1,4 +1,4 @@
-package com.example.waguwagu.domain.request;
+package com.example.waguwagu.domain.dto.request;
 
 import java.time.LocalDate;
 

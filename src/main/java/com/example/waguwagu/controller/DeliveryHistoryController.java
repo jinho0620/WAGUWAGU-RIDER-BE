@@ -1,6 +1,6 @@
 package com.example.waguwagu.controller;
 
-import com.example.waguwagu.domain.response.DeliveryHistoryResponse;
+import com.example.waguwagu.domain.dto.response.DeliveryHistoryResponse;
 import com.example.waguwagu.service.DeliveryHistoryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;

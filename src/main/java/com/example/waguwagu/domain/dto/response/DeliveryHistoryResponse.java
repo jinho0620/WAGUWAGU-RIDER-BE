@@ -1,11 +1,9 @@
-package com.example.waguwagu.domain.response;
+package com.example.waguwagu.domain.dto.response;
 
 import com.example.waguwagu.domain.entity.DeliveryHistory;
-import com.example.waguwagu.domain.entity.DeliveryHistoryDetail;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 public record DeliveryHistoryResponse (
         Long deliveryHistoryId,
