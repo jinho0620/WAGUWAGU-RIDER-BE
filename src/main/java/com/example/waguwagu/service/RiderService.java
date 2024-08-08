@@ -1,8 +1,7 @@
 package com.example.waguwagu.service;
 
 import com.example.waguwagu.domain.entity.Rider;
-import com.example.waguwagu.domain.request.ChangeActivationStateRequest;
-import com.example.waguwagu.domain.request.RiderUpdateRequest;
+import com.example.waguwagu.domain.dto.request.ChangeActivationStateRequest;
 
 
 public interface RiderService {

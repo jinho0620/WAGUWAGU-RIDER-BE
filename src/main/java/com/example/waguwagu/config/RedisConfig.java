@@ -13,14 +13,29 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 @Configuration
 public class RedisConfig {
     @Bean
-    public RedisTemplate<String, String> redisTemplate(RedisConnectionFactory redisConnectionFactory) {
+    public RedisTemplate<String, String> redisTemplate() {
+        LettuceConnectionFactory connectionFactory = new LettuceConnectionFactory();
+        connectionFactory.afterPropertiesSet();
         RedisTemplate<String, String> geoTemplate = new RedisTemplate<>();
-        geoTemplate.setConnectionFactory(redisConnectionFactory);
+        geoTemplate.setConnectionFactory(connectionFactory);
         geoTemplate.setKeySerializer(new StringRedisSerializer());
         geoTemplate.setValueSerializer(new Jackson2JsonRedisSerializer<>(new ObjectMapper(), DeliveryRequest.class));
         geoTemplate.afterPropertiesSet();
         return geoTemplate;
-
     }
 }
 
+
+//@Configuration
+//public class RedisConfig {
+//    @Bean
+//    public RedisTemplate<String, String> redisTemplate(RedisConnectionFactory redisConnectionFactory) {
+//        RedisTemplate<String, String> geoTemplate = new RedisTemplate<>();
+//        geoTemplate.setConnectionFactory(redisConnectionFactory);
+//        geoTemplate.setKeySerializer(new StringRedisSerializer());
+//        geoTemplate.setValueSerializer(new Jackson2JsonRedisSerializer<>(new ObjectMapper(), DeliveryRequest.class));
+//        geoTemplate.afterPropertiesSet();
+//        return geoTemplate;
+//
+//    }
+//}

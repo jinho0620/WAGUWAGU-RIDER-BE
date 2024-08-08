@@ -30,6 +30,8 @@ public class DeliveryRequest {
     private double storeLatitude;
     private double storeLongitude;
     private LocalDateTime due;
+    @Setter
+    private boolean assigned;
 }
 
 

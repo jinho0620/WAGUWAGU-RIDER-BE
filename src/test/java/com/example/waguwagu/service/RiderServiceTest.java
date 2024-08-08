@@ -1,13 +1,12 @@
 package com.example.waguwagu.service;
 
 import com.example.waguwagu.domain.entity.Rider;
-import com.example.waguwagu.domain.request.ChangeActivationStateRequest;
+import com.example.waguwagu.domain.dto.request.ChangeActivationStateRequest;
 import com.example.waguwagu.domain.type.RiderTransportation;
 import com.example.waguwagu.global.dao.RiderDao;
 import com.example.waguwagu.global.exception.RiderNotFoundException;
 import com.example.waguwagu.kafka.dto.KafkaRiderDto;
 import com.example.waguwagu.kafka.KafkaStatus;
-import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
