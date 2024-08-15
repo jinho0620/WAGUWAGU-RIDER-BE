@@ -10,7 +10,7 @@ import java.util.UUID;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/rider-locations")
+@RequestMapping("/api/v1/riders/rider-locations")
 public class RiderLocationController {
     private final RiderLocationService riderLocationService;
 

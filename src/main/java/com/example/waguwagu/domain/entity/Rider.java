@@ -5,6 +5,7 @@ import com.example.waguwagu.kafka.dto.KafkaRiderDto;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.sql.Timestamp;
 import java.util.List;
 
 @Entity
@@ -47,6 +48,10 @@ public class Rider {
     @Column(name = "RIDER_IS_DELETED")
     @Builder.Default
     private boolean riderIsDeleted = false;
+
+    @Column(name = "RIDER_CREATED_AT")
+    @Builder.Default
+    private Timestamp riderCreatedAt = new Timestamp(System.currentTimeMillis());
 
     public void update(KafkaRiderDto dto) {
         if (!dto.riderEmail().equals(this.riderEmail)) this.riderEmail = dto.riderEmail();

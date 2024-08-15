@@ -31,7 +31,9 @@ public class RiderLocationServiceImpl implements RiderLocationService {
     public RiderLocationResponse getByOrderId(UUID orderId) {
         RiderLocation location = riderLocationRedisRepository.findById(orderId)
                 .orElseThrow(RiderLocationNotFoundException::new);
+        log.info(location.toString());
         Rider rider = riderService.getById(location.getRiderId());
+        log.info(rider.toString());
         RiderTransportation riderTransportation = rider.getRiderTransportation();
         RiderLocationResponse res = RiderLocationResponse.from(location, riderTransportation);
         return res;

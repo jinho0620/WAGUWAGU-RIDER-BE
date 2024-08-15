@@ -15,7 +15,7 @@ public record DeliveryHistoryDetailResponse(
         DeliveryHistoryDetailResponse res = new DeliveryHistoryDetailResponse(
                 detail.getDeliveryHistoryDetailId(),
                 detail.getDeliveryIncome(),
-                detail.getDeliveryHistoryDetailCreatedAt(),
+                detail.getDeliveryHistoryDetailCreatedAt().toLocalDateTime(),
                 detail.getStoreName()
         );
         return res;

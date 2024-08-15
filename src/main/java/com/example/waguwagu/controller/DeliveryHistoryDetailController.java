@@ -11,7 +11,7 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/delivery-history-details")
+@RequestMapping("/api/v1/riders/delivery-history-details")
 public class DeliveryHistoryDetailController {
     private final DeliveryHistoryDetailService deliveryHistoryDetailService;
 

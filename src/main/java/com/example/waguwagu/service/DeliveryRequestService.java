@@ -9,5 +9,5 @@ import java.util.UUID;
 public interface DeliveryRequestService {
     List<RiderAssignResponse> assignRider(Long riderId, RiderAssignRequest req);
     void deleteById(UUID id);
-    void updateRiderAssignedAsTrue(UUID id);
+    void updateRiderAssigned(UUID id);
 }

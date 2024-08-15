@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/riders")
+@RequestMapping("/api/v1/riders/accounts")
 public class RiderController {
     private final RiderService riderService;
     // kafka로 rider 객체 받음

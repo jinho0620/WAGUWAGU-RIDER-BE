@@ -3,6 +3,7 @@ package com.example.waguwagu.global.repository;
 import com.example.waguwagu.domain.entity.DeliveryHistory;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;

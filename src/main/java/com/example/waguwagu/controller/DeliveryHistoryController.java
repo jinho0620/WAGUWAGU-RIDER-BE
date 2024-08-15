@@ -9,7 +9,7 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/delivery-histories")
+@RequestMapping("/api/v1/riders/delivery-histories")
 public class DeliveryHistoryController {
     private final DeliveryHistoryService deliveryHistoryService;
 
