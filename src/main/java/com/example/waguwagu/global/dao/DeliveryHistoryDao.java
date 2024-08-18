@@ -13,4 +13,5 @@ public interface DeliveryHistoryDao {
     List<DeliveryHistory> findByRiderId(Long riderId);
     DeliveryHistory findById(Long deliveryHistoryId);
     DeliveryHistory findByCreatedAt(LocalDate date);
+    DeliveryHistory findByRiderIdOfToday(Long riderId);
 }

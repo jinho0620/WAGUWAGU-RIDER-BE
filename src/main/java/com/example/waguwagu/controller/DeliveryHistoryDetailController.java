@@ -28,4 +28,5 @@ public class DeliveryHistoryDetailController {
     public DeliveryHistorySummaryResponse getSummaryByDeliveryHistoryId(@PathVariable Long deliveryHistoryId) {
         return deliveryHistoryDetailService.getSummaryByDeliveryHistoryId(deliveryHistoryId);
     }
+
 }

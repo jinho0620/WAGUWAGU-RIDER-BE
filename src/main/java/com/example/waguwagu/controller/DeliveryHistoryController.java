@@ -33,4 +33,8 @@ public class DeliveryHistoryController {
     public List<DeliveryHistoryResponse> getDeliveryHistories(@PathVariable Long riderId) {
         return deliveryHistoryService.getDeliveryHistories(riderId);
     }
+    @GetMapping("/today/rider/{riderId}")
+    public DeliveryHistoryResponse getTodayDeliveryHistory(@PathVariable Long riderId) {
+        return deliveryHistoryService.getTodayDeliveryHistory(riderId);
+    }
 }

@@ -13,6 +13,6 @@ public interface DeliveryHistoryRepository extends JpaRepository<DeliveryHistory
 //    List<DeliveryHistory> findByRider_RiderIdAndRider_RiderIsDeletedFalseAndDeliveryHistoryIsDeletedFalseAndDeliveryIncomeCreatedAtBetween(Long riderId, LocalDateTime from, LocalDateTime to);
 
     List<DeliveryHistory> findByRider_RiderIdAndRider_RiderIsDeletedFalseAndDeliveryHistoryIsDeletedFalse(Long riderId);
-
     Optional<DeliveryHistory> findByDeliveryHistoryCreatedAtAndDeliveryHistoryIsDeletedFalse(LocalDate date);
+    Optional<DeliveryHistory> findByRider_RiderIdAndRider_RiderIsDeletedFalseAndDeliveryHistoryIsDeletedFalseAndDeliveryHistoryCreatedAt(Long riderId, LocalDate date);
 }

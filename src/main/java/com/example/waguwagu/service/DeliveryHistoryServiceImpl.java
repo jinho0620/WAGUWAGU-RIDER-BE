@@ -65,4 +65,11 @@ public class DeliveryHistoryServiceImpl implements DeliveryHistoryService {
     public DeliveryHistory getById(Long deliveryHistoryId) {
         return deliveryHistoryDao.findById(deliveryHistoryId);
     }
+
+    @Override
+    public DeliveryHistoryResponse getTodayDeliveryHistory(Long riderId) {
+        DeliveryHistory history = deliveryHistoryDao.findByRiderIdOfToday(riderId);
+        DeliveryHistoryResponse res = DeliveryHistoryResponse.from(history);
+        return res;
+    }
 }

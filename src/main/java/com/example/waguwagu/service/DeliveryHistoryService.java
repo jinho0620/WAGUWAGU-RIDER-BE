@@ -10,5 +10,6 @@ public interface DeliveryHistoryService {
 //    List<DeliveryHistoryResponse> getDeliveryHistories(Long riderId, DurationForHistoryRequest dto);
     List<DeliveryHistoryResponse> getDeliveryHistories(Long riderId);
     DeliveryHistory getById(Long deliveryHistoryId);
+    DeliveryHistoryResponse getTodayDeliveryHistory(Long riderId);
 }
 

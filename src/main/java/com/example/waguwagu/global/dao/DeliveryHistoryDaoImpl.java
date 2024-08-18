@@ -47,4 +47,13 @@ public class DeliveryHistoryDaoImpl implements DeliveryHistoryDao {
                 .orElseThrow(DeliveryHistoryNotFoundException::new);
         return history;
     }
+
+    @Override
+    public DeliveryHistory findByRiderIdOfToday(Long riderId) {
+        DeliveryHistory history =
+                deliveryHistoryRepository
+                        .findByRider_RiderIdAndRider_RiderIsDeletedFalseAndDeliveryHistoryIsDeletedFalseAndDeliveryHistoryCreatedAt(riderId, LocalDate.now())
+                        .orElseThrow(DeliveryHistoryNotFoundException::new);
+        return history;
+    }
 }
