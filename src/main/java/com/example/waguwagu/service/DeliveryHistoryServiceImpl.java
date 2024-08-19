@@ -68,8 +68,12 @@ public class DeliveryHistoryServiceImpl implements DeliveryHistoryService {
 
     @Override
     public DeliveryHistoryResponse getTodayDeliveryHistory(Long riderId) {
-        DeliveryHistory history = deliveryHistoryDao.findByRiderIdOfToday(riderId);
-        DeliveryHistoryResponse res = DeliveryHistoryResponse.from(history);
-        return res;
+        try {
+            DeliveryHistory history = deliveryHistoryDao.findByRiderIdOfToday(riderId);
+            DeliveryHistoryResponse res = DeliveryHistoryResponse.from(history);
+            return res;
+        } catch (DeliveryHistoryNotFoundException e) {
+            return null;
+        }
     }
 }

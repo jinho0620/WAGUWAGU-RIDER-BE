@@ -116,7 +116,8 @@ class DeliveryHistoryServiceTest {
         @Test
         @DisplayName("getTodayDeliveryHistory fail : should throw exception when delivery history doesn't exist")
         void fail() {
-            assertThrows(DeliveryHistoryNotFoundException.class, () -> deliveryHistoryService.getTodayDeliveryHistory(10000000L));
+            DeliveryHistoryResponse res = deliveryHistoryService.getTodayDeliveryHistory(5054054L);
+            assertNull(res);
         }
     }
 }
