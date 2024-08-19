@@ -82,18 +82,7 @@ public class DeliveryRequestServiceImpl implements DeliveryRequestService {
                             deliveryRequest.getDistanceFromStoreToCustomer()
                     );
                     int totalCost = deliveryRequest.getDeliveryPay() + costByDistance;
-                    RiderAssignResponse response = new RiderAssignResponse(
-                            deliveryRequest.getId(),
-                            deliveryRequest.getOrderId(),
-                            deliveryRequest.getStoreName(),
-                            deliveryRequest.getStoreAddress(),
-                            totalCost,
-                            deliveryRequest.getDue().toLocalDateTime(),
-                            deliveryRequest.getDistanceFromStoreToCustomer(),
-                            Math.floor(distance.getValue()*10)/10,
-                            deliveryRequest.getStoreLatitude(),
-                            deliveryRequest.getStoreLongitude()
-                    );
+                    RiderAssignResponse response = RiderAssignResponse.from(deliveryRequest, distance, totalCost);
                     list.add(response);
                 };
             };
