@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/geo")
+@RequestMapping("/api/v1/riders/geo")
 public class GeoDistanceController {
     private final GeoDistanceService geoDistanceService;
 

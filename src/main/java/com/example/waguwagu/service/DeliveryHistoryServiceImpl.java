@@ -9,6 +9,8 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.sql.Timestamp;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -62,5 +64,16 @@ public class DeliveryHistoryServiceImpl implements DeliveryHistoryService {
     @Override
     public DeliveryHistory getById(Long deliveryHistoryId) {
         return deliveryHistoryDao.findById(deliveryHistoryId);
+    }
+
+    @Override
+    public DeliveryHistoryResponse getTodayDeliveryHistory(Long riderId) {
+        try {
+            DeliveryHistory history = deliveryHistoryDao.findByRiderIdOfToday(riderId);
+            DeliveryHistoryResponse res = DeliveryHistoryResponse.from(history);
+            return res;
+        } catch (DeliveryHistoryNotFoundException e) {
+            return null;
+        }
     }
 }

@@ -3,6 +3,7 @@ package com.example.waguwagu.domain.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -23,7 +24,8 @@ public class DeliveryHistoryDetail {
 
     @Builder.Default
     @Column(name = "DELIVERY_HISTORY_DETAIL_CREATED_AT", unique = true)
-    private LocalDateTime deliveryHistoryDetailCreatedAt = LocalDateTime.now();
+    // LocalDateTime으로 변환해서 프론트에 던져줌
+    private Timestamp deliveryHistoryDetailCreatedAt = new Timestamp(System.currentTimeMillis());
 
     @Column(name = "STORE_NAME")
     private String storeName;

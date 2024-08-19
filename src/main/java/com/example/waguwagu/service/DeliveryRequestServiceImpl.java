@@ -1,10 +1,9 @@
 package com.example.waguwagu.service;
 
-import com.example.waguwagu.domain.entity.DeliveryRequest;
-import com.example.waguwagu.domain.entity.Rider;
-
 import com.example.waguwagu.domain.dto.request.RiderAssignRequest;
 import com.example.waguwagu.domain.dto.response.RiderAssignResponse;
+import com.example.waguwagu.domain.entity.DeliveryRequest;
+import com.example.waguwagu.domain.entity.Rider;
 import com.example.waguwagu.domain.type.RiderTransportation;
 import com.example.waguwagu.global.exception.DeliveryRequestNotFoundException;
 import com.example.waguwagu.global.exception.RiderNotActiveException;
@@ -46,15 +45,13 @@ public class DeliveryRequestServiceImpl implements DeliveryRequestService {
     private final DeliveryRequestRedisRepository deliveryRequestRedisRepository;
     private final RiderService riderService;
     private final RedisTemplate<String, String> redisTemplate;
-    private final DeliveryHistoryService deliveryHistoryService;
-    private final DeliveryHistoryDetailService deliveryHistoryDetailService;
 
     @Override
     public List<RiderAssignResponse> assignRider(Long riderId, RiderAssignRequest req) {
         Rider rider = riderService.getById(riderId);
         if (!rider.isRiderIsActive()) throw new RiderNotActiveException(); // rider가 활성화 상태인지 확인
-        List<com.example.waguwagu.domain.entity.DeliveryRequest> deliveryRequests = deliveryRequestRedisRepository.findAll();
-        System.out.println(deliveryRequests);
+        List<DeliveryRequest> deliveryRequests = deliveryRequestRedisRepository.findAll();
+        log.info(deliveryRequests.toString());
         String key = "points";
         Metric metric = RedisGeoCommands.DistanceUnit.KILOMETERS;
         Point myLocation = new Point(req.longitude(), req.latitude());
@@ -62,7 +59,7 @@ public class DeliveryRequestServiceImpl implements DeliveryRequestService {
         geoOperations.add(key, myLocation, "me");
         List<RiderAssignResponse> list = new ArrayList<>();
 
-        for (com.example.waguwagu.domain.entity.DeliveryRequest deliveryRequest : deliveryRequests) {
+        for (DeliveryRequest deliveryRequest : deliveryRequests) {
             // 가게의 구(ex. 노원구) 꺼내기
             String[] storeAddress = deliveryRequest.getStoreAddress().split(" ");
             String storeDistrict = storeAddress[1];
@@ -76,16 +73,22 @@ public class DeliveryRequestServiceImpl implements DeliveryRequestService {
                         new Point(deliveryRequest.getStoreLongitude(), deliveryRequest.getStoreLatitude()),
                         "store");
                 Distance distance = geoOperations.distance(key, "me", "store", metric);
-                System.out.println(distance);
+                log.info(distance.toString());
+                // 라이더 ~ 가게 거리가 5km 이내에 있다면 배정
                 if (distance.getValue() <= 5) {
-                    System.out.println(deliveryRequest.getId());
+                    // 가게 부담 배달비 계산 (이동수단과 가게 ~ 고객 거리 고려)
+                    int costByDistance = RiderTransportation.calculateDeliveryFeeByTransportation(
+                            rider.getRiderTransportation(),
+                            deliveryRequest.getDistanceFromStoreToCustomer()
+                    );
+                    int totalCost = deliveryRequest.getDeliveryPay() + costByDistance;
                     RiderAssignResponse response = new RiderAssignResponse(
                             deliveryRequest.getId(),
                             deliveryRequest.getOrderId(),
                             deliveryRequest.getStoreName(),
                             deliveryRequest.getStoreAddress(),
-                            deliveryRequest.getDeliveryPay(),
-                            deliveryRequest.getDue(),
+                            totalCost,
+                            deliveryRequest.getDue().toLocalDateTime(),
                             deliveryRequest.getDistanceFromStoreToCustomer(),
                             Math.floor(distance.getValue()*10)/10,
                             deliveryRequest.getStoreLatitude(),
@@ -102,32 +105,14 @@ public class DeliveryRequestServiceImpl implements DeliveryRequestService {
     @KafkaListener(topics = "order-topic", id = "delivery")
     public void save(KafkaStatus<KafkaDeliveryRequestDto> dto) {
         if (dto.status().equals("insert")) {
-            System.out.println(dto);
+            log.info(dto.toString());
             log.info("Order data successfully received for orderId: " + dto.data().orderId());
-            List<RiderTransportation> transportations = new ArrayList<>();
-            // 가게 ~ 고객 거리 < 1km 일 때, 모든 종류의 이동수단 가능
-            if (dto.data().distanceFromStoreToCustomer() < 1) {
-                transportations.addAll(Arrays.asList(
-                        RiderTransportation.WALK,
-                        RiderTransportation.BICYCLE,
-                        RiderTransportation.MOTORBIKE,
-                        RiderTransportation.CAR));
-                // 1km <= 가게 ~ 고객 거리 < 2.5km 일 때, 도보 빼고 전부 가능
-            } else if (dto.data().distanceFromStoreToCustomer() < 2.5) {
-                transportations.addAll(Arrays.asList(
-                        RiderTransportation.BICYCLE,
-                        RiderTransportation.MOTORBIKE,
-                        RiderTransportation.CAR));
-                // 가게 ~ 고객 거리 >= 2.5km 일 때, 오토바이, 자동차만 가능
-            } else if (dto.data().distanceFromStoreToCustomer() <= 5){
-                transportations.addAll(Arrays.asList(
-                        RiderTransportation.MOTORBIKE,
-                        RiderTransportation.CAR));
-            }
-            com.example.waguwagu.domain.entity.DeliveryRequest deliveryRequest = dto.data().toEntity(transportations);
+            // 가게 ~ 고객 거리에 따라 배달 가능한 이동 수단 제한
+            List<RiderTransportation> transportations = RiderTransportation
+                    .chooseTransportationByDistance(dto.data().distanceFromStoreToCustomer());
+            DeliveryRequest deliveryRequest = dto.data().toEntity(transportations);
             deliveryRequestRedisRepository.save(deliveryRequest);
         }
-
     }
 
     @Override
@@ -138,10 +123,10 @@ public class DeliveryRequestServiceImpl implements DeliveryRequestService {
     }
 
     @Override
-    public void updateRiderAssignedAsTrue(UUID id) {
+    public void updateRiderAssigned(UUID id) {
         DeliveryRequest deliveryRequest = deliveryRequestRedisRepository.findById(id)
                 .orElseThrow(DeliveryRequestNotFoundException::new);
-        deliveryRequest.setAssigned(true);
+        deliveryRequest.setAssigned(!deliveryRequest.isAssigned());
         deliveryRequestRedisRepository.save(deliveryRequest);
     }
 }

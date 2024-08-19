@@ -9,7 +9,7 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/delivery-histories")
+@RequestMapping("/api/v1/riders/delivery-histories")
 public class DeliveryHistoryController {
     private final DeliveryHistoryService deliveryHistoryService;
 
@@ -32,5 +32,9 @@ public class DeliveryHistoryController {
     @GetMapping("/rider/{riderId}")
     public List<DeliveryHistoryResponse> getDeliveryHistories(@PathVariable Long riderId) {
         return deliveryHistoryService.getDeliveryHistories(riderId);
+    }
+    @GetMapping("/today/rider/{riderId}")
+    public DeliveryHistoryResponse getTodayDeliveryHistory(@PathVariable Long riderId) {
+        return deliveryHistoryService.getTodayDeliveryHistory(riderId);
     }
 }

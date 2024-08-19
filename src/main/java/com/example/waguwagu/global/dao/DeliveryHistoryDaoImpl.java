@@ -7,6 +7,7 @@ import com.example.waguwagu.global.repository.DeliveryHistoryRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -44,6 +45,15 @@ public class DeliveryHistoryDaoImpl implements DeliveryHistoryDao {
         DeliveryHistory history = deliveryHistoryRepository
                 .findByDeliveryHistoryCreatedAtAndDeliveryHistoryIsDeletedFalse(date)
                 .orElseThrow(DeliveryHistoryNotFoundException::new);
+        return history;
+    }
+
+    @Override
+    public DeliveryHistory findByRiderIdOfToday(Long riderId) {
+        DeliveryHistory history =
+                deliveryHistoryRepository
+                        .findByRider_RiderIdAndRider_RiderIsDeletedFalseAndDeliveryHistoryIsDeletedFalseAndDeliveryHistoryCreatedAt(riderId, LocalDate.now())
+                        .orElseThrow(DeliveryHistoryNotFoundException::new);
         return history;
     }
 }

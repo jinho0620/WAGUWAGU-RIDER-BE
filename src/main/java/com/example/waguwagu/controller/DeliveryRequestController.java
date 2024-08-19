@@ -12,7 +12,7 @@ import java.util.UUID;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/delivery-requests")
+@RequestMapping("/api/v1/riders/delivery-requests")
 public class DeliveryRequestController {
     private final DeliveryRequestService deliveryRequestService;
 
@@ -29,7 +29,7 @@ public class DeliveryRequestController {
     }
 
     @PutMapping("/{id}")
-    public void updateRiderAssignedAsTrue(@PathVariable UUID id) {
-        deliveryRequestService.updateRiderAssignedAsTrue(id);
+    public void updateRiderAssigned(@PathVariable UUID id) {
+        deliveryRequestService.updateRiderAssigned(id);
     }
 }

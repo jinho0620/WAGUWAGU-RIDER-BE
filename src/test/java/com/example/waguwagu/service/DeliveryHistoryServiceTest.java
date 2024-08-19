@@ -15,6 +15,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
 
@@ -56,10 +57,10 @@ class DeliveryHistoryServiceTest {
 
     @Nested
     @DisplayName("Fetch delivery histories by rider id")
+    @Transactional
     class getDeliveryHistories {
         @Test
         @DisplayName("Success : should fetch delivery histories")
-        @Transactional
         void success() {
             Long deliveryHistoryId = deliveryHistoryService.saveDeliveryHistory(200L);
             List<DeliveryHistoryResponse> res = deliveryHistoryService.getDeliveryHistories(200L);
@@ -70,7 +71,6 @@ class DeliveryHistoryServiceTest {
         }
         @Test
         @DisplayName("Success : should return empty list when delivery history doesn't exist")
-        @Transactional
         void success_empty_history() {
             List<DeliveryHistoryResponse> res = deliveryHistoryService.getDeliveryHistories(200L);
 
@@ -81,10 +81,10 @@ class DeliveryHistoryServiceTest {
 
     @Nested
     @DisplayName("Fetch delivery histories by id")
+    @Transactional
     class getById {
         @Test
         @DisplayName("Success : should fetch delivery histories")
-        @Transactional
         void success() {
             Long deliveryHistoryId = deliveryHistoryService.saveDeliveryHistory(200L);
             DeliveryHistory deliveryHistory = deliveryHistoryService.getById(deliveryHistoryId);
@@ -94,11 +94,30 @@ class DeliveryHistoryServiceTest {
         }
         @Test
         @DisplayName("Fail : should throw exception when delivery history doesn't exist")
-        @Transactional
         void fail() {
             assertThrows(DeliveryHistoryNotFoundException.class, () -> deliveryHistoryService.getById(10000000L));
         }
     }
 
+    @Nested
+    @Transactional
+    class getTodayDeliveryHistory {
+        @Test
+        @DisplayName("getTodayDeliveryHistory success : should fetch today's delivery history")
+        void success() {
+            Long deliveryHistoryId = deliveryHistoryService.saveDeliveryHistory(200L);
+            DeliveryHistoryResponse res = deliveryHistoryService.getTodayDeliveryHistory(200L);
 
+            assertNotNull(res);
+            assertEquals(deliveryHistoryId, res.deliveryHistoryId());
+            assertEquals(LocalDate.now(), res.deliveryHistoryCreatedAt());
+        }
+
+        @Test
+        @DisplayName("getTodayDeliveryHistory fail : should throw exception when delivery history doesn't exist")
+        void fail() {
+            DeliveryHistoryResponse res = deliveryHistoryService.getTodayDeliveryHistory(5054054L);
+            assertNull(res);
+        }
+    }
 }
