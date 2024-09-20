@@ -3,6 +3,8 @@ package com.example.waguwagu.domain.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.sql.Time;
+import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
@@ -20,6 +22,7 @@ public class DeliveryHistory {
 
     @Builder.Default
     @Column(name = "DELIVERY_HISTORY_CREATED_AT")
+    // LocalDate로 변환해서 던져준다.
     private LocalDate deliveryHistoryCreatedAt = LocalDate.now();
 
     @ManyToOne

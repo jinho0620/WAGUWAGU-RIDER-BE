@@ -1,11 +1,9 @@
 package com.example.waguwagu.controller;
 
-import com.example.waguwagu.domain.request.DeliveryHistoryDetailRequest;
-import com.example.waguwagu.domain.response.DeliveryHistoryDetailResponse;
-import com.example.waguwagu.domain.response.DeliveryHistoryResponse;
-import com.example.waguwagu.domain.response.DeliveryHistorySummaryResponse;
+import com.example.waguwagu.domain.dto.request.DeliveryHistoryDetailRequest;
+import com.example.waguwagu.domain.dto.response.DeliveryHistoryDetailResponse;
+import com.example.waguwagu.domain.dto.response.DeliveryHistorySummaryResponse;
 import com.example.waguwagu.service.DeliveryHistoryDetailService;
-import com.example.waguwagu.service.DeliveryHistoryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -13,7 +11,7 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/delivery-history-details")
+@RequestMapping("/api/v1/riders/delivery-history-details")
 public class DeliveryHistoryDetailController {
     private final DeliveryHistoryDetailService deliveryHistoryDetailService;
 
@@ -30,4 +28,5 @@ public class DeliveryHistoryDetailController {
     public DeliveryHistorySummaryResponse getSummaryByDeliveryHistoryId(@PathVariable Long deliveryHistoryId) {
         return deliveryHistoryDetailService.getSummaryByDeliveryHistoryId(deliveryHistoryId);
     }
+
 }

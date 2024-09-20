@@ -1,5 +1,6 @@
-package com.example.waguwagu.domain.response;
+package com.example.waguwagu.domain.dto.response;
 
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
