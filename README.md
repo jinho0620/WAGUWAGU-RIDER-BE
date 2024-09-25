@@ -40,6 +40,8 @@ https://github.com/WAGUWAGUUU/WAGUWAGU
    
 ## <br>🧾 API 명세서 (with Swagger API)<br><br>
 
+<img width="1085" alt="image" src="https://github.com/user-attachments/assets/4ebb2ae2-7bbb-41c7-ac1b-38759efd342b">
+<img width="1085" alt="image" src="https://github.com/user-attachments/assets/a584ba9c-c81a-42cb-a5ac-0a80ab9a693c">
 
 <br><br>
 
