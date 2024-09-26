@@ -2,13 +2,11 @@ package com.example.waguwagu.service;
 
 import com.example.waguwagu.domain.entity.DeliveryHistory;
 import com.example.waguwagu.domain.entity.DeliveryHistoryDetail;
-import com.example.waguwagu.domain.request.DeliveryHistoryDetailRequest;
-import com.example.waguwagu.domain.response.DeliveryHistoryDetailResponse;
-import com.example.waguwagu.domain.response.DeliveryHistorySummaryResponse;
-import com.example.waguwagu.global.dao.DeliveryHistoryDao;
+import com.example.waguwagu.domain.dto.request.DeliveryHistoryDetailRequest;
+import com.example.waguwagu.domain.dto.response.DeliveryHistoryDetailResponse;
+import com.example.waguwagu.domain.dto.response.DeliveryHistorySummaryResponse;
 import com.example.waguwagu.global.dao.DeliveryHistoryDetailDao;
 import com.example.waguwagu.global.exception.DeliveryHistoryDetailNotFoundException;
-import com.example.waguwagu.global.exception.DeliveryHistoryNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -49,6 +47,7 @@ public class DeliveryHistoryDetailServiceImpl implements DeliveryHistoryDetailSe
             totalIncome += detail.getDeliveryIncome();
         }
         DeliveryHistorySummaryResponse summary = new DeliveryHistorySummaryResponse(details.size(), totalIncome);
+        System.out.println(summary);
         return summary;
     }
 }

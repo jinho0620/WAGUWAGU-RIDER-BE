@@ -1,4 +1,4 @@
-package com.example.waguwagu.domain.response;
+package com.example.waguwagu.domain.dto.response;
 
 import com.example.waguwagu.domain.entity.DeliveryHistoryDetail;
 
@@ -15,7 +15,7 @@ public record DeliveryHistoryDetailResponse(
         DeliveryHistoryDetailResponse res = new DeliveryHistoryDetailResponse(
                 detail.getDeliveryHistoryDetailId(),
                 detail.getDeliveryIncome(),
-                detail.getDeliveryHistoryDetailCreatedAt(),
+                detail.getDeliveryHistoryDetailCreatedAt().toLocalDateTime(),
                 detail.getStoreName()
         );
         return res;

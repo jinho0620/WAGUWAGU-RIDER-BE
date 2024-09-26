@@ -1,8 +1,8 @@
 spring:
   application:
-    name: waguwagu-rider
+    name: rider
   datasource:
-    url: jdbc:postgresql://localhost:5432/waguwagu?characterEncoding=UTF-8&serverTimezone=Asia/Seoul
+    url: jdbc:postgresql://localhost:5432/waguwagu_rider?characterEncoding=UTF-8&serverTimezone=Asia/Seoul
     username: postgres
     password: 1234
   jpa:
@@ -17,10 +17,11 @@ spring:
       host: redis-stack
       port: 6379
   kafka:
-    bootstrap-servers: 34.71.194.186:9094
+    bootstrap-servers: 104.197.138.114:9094
     producer:
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
     consumer:
+      group-id: local
       value-deserializer: org.apache.kafka.common.serialization.ByteArrayDeserializer
       auto-offset-reset: earliest
 management:

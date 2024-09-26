@@ -12,11 +12,18 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 import org.springframework.kafka.support.converter.JsonMessageConverter;
 import org.springframework.kafka.support.converter.RecordMessageConverter;
 
+import java.sql.Timestamp;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.TimeZone;
+
 @SpringBootApplication
 public class WaguwaguApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(WaguwaguApplication.class, args);
+		TimeZone.setDefault(TimeZone.getTimeZone("GMT+9:00"));
 	}
 
 //	@Bean
