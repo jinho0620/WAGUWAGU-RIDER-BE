@@ -18,6 +18,15 @@ public enum RiderTransportation {
         this.maxDistance = maxDistance;
     }
 
+    public static List<RiderTransportation> chooseTransportationByDistance(double distanceFromStoreToCustomer) {
+        List<RiderTransportation> filteredTransportations = Arrays.stream(RiderTransportation.values())
+                .filter(transportation -> distanceFromStoreToCustomer <= transportation.maxDistance)
+                .toList();
+
+        return filteredTransportations;
+    }
+
+
     public static int calculateDeliveryFeeByTransportation(RiderTransportation riderTransportation, double distanceFromStoreToCustomer) {
         int costByDistance;
         if (riderTransportation.equals(RiderTransportation.CAR)) costByDistance
@@ -29,13 +38,4 @@ public enum RiderTransportation {
         else costByDistance = (int) (distanceFromStoreToCustomer * RiderTransportation.WALK.costPerKm);
         return costByDistance;
     }
-
-    public static List<RiderTransportation> chooseTransportationByDistance(double distanceFromStoreToCustomer) {
-        List<RiderTransportation> filteredTransportations = Arrays.stream(RiderTransportation.values())
-                .filter(transportation -> distanceFromStoreToCustomer <= transportation.maxDistance)
-                .toList();
-
-        return filteredTransportations;
-    }
-
 }
