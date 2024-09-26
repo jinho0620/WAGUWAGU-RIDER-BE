@@ -55,3 +55,17 @@ https://github.com/WAGUWAGUUU/WAGUWAGU
 
 
 ##  <br>🔧 트러블 슈팅
+
+**1. linux 환경에서 ```export postgres-user=root```를 하면 ```-bash: export: `postgres-user=root': not a valid identifier```와 같은 에러가 뜬다.<br><br>**
+> * 원인 : linux 환경에서 환경 변수이름에 - (dash)를 쓸 수 없다. 대신 _ (underscore)를 써야 한다.<br><br>
+> * 해결 : ```export postgres_user=root``` 후 ```echo $postgres_user``` 를 하면 root로 제대로 뜬다.<br>
+
+<br>
+
+**2. application.yaml file에서 환경 변수 설정 시 ${ POSTGRES-USER }와 같이 중괄호와 변수명 사이에 space가 있으면 환경 변수 주입이 되지 않는다.<br><br>**
+> * 원인 : Yaml file은 space가 있고 없음을 구분한다. (space-sensitive) <br><br>
+> * 해결 : ${POSTGRES-USER} 로 진행해야 배포할 때 docker run 혹은 kubernetes의 env 항목의 환경 변수 값이 제대로 주입된다.<br>
+
+<br>
+
+
