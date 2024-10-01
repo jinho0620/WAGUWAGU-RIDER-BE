@@ -55,7 +55,8 @@ https://github.com/WAGUWAGUUU/WAGUWAGU
 
 ##  <br>🔧 성능 개선 사항
 
-<img width="958" alt="image" src="https://github.com/user-attachments/assets/468fc1f6-6795-481c-8b2a-d5103384e512">
+<img width="956" alt="image" src="https://github.com/user-attachments/assets/83f2b723-533c-46b7-818c-2deb3186d69e">
+
 
 
 
