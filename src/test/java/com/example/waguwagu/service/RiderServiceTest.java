@@ -2,7 +2,7 @@ package com.example.waguwagu.service;
 
 import com.example.waguwagu.domain.entity.Rider;
 import com.example.waguwagu.domain.dto.request.ChangeActivationStateRequest;
-import com.example.waguwagu.domain.type.RiderTransportation;
+import com.example.waguwagu.domain.type.Transportation;
 import com.example.waguwagu.global.dao.RiderDao;
 import com.example.waguwagu.global.exception.RiderNotFoundException;
 import com.example.waguwagu.kafka.dto.KafkaRiderDto;
@@ -33,7 +33,7 @@ class RiderServiceTest {
                         "Jinho",
                         "123-456-7890",
                         Arrays.asList("노원구", "도봉구", "서초구"),
-                        RiderTransportation.BICYCLE,
+                        Transportation.BICYCLE,
                         "123-456-789",
                         false), "insert");
         riderServiceImpl.saveRider(kafkaStatus);
@@ -43,7 +43,7 @@ class RiderServiceTest {
     void saveRider() {
         Rider savedRider = riderDao.findById(1000L);
         assertNotNull(savedRider);
-        assertEquals("wlshzz@naver.com", savedRider.getRiderEmail());
+        assertEquals("wlshzz@naver.com", savedRider.getEmail());
     }
 
     @Test
@@ -54,7 +54,7 @@ class RiderServiceTest {
                         "Jinho",
                         "010-4030-9482",
                         Arrays.asList("노원구", "강북구", "서초구", "강남구"),
-                        RiderTransportation.MOTORBIKE,
+                        Transportation.MOTORBIKE,
                         "123-456-789",
                         false), "update");
 
@@ -62,8 +62,8 @@ class RiderServiceTest {
         Rider updatedRider = riderDao.findById(1000L);
 
         assertNotNull(updatedRider);
-        assertEquals("010-4030-9482", updatedRider.getRiderPhoneNumber());
-        assertEquals(RiderTransportation.MOTORBIKE, updatedRider.getRiderTransportation());
+        assertEquals("010-4030-9482", updatedRider.getPhoneNumber());
+        assertEquals(Transportation.MOTORBIKE, updatedRider.getTransportation());
     }
 
     @Nested
@@ -75,7 +75,7 @@ class RiderServiceTest {
             Rider getRider = riderServiceImpl.getById(riderId);
 
             assertNotNull(getRider);
-            assertEquals("wlshzz@naver.com", getRider.getRiderEmail());
+            assertEquals("wlshzz@naver.com", getRider.getEmail());
         }
 
         @Test
@@ -93,7 +93,7 @@ class RiderServiceTest {
             Long riderId = 1000L;
             riderServiceImpl.changeActivationState(riderId, new ChangeActivationStateRequest("off"));
             Rider changedRider = riderDao.findById(riderId);
-            assertFalse(changedRider.isRiderIsActive());
+            assertFalse(changedRider.isActive());
         }
 
         @Test

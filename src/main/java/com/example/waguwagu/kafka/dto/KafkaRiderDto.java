@@ -1,8 +1,7 @@
 package com.example.waguwagu.kafka.dto;
 
 import com.example.waguwagu.domain.entity.Rider;
-import com.example.waguwagu.domain.type.RiderTransportation;
-import lombok.ToString;
+import com.example.waguwagu.domain.type.Transportation;
 
 import java.util.List;
 
@@ -12,20 +11,20 @@ public record KafkaRiderDto(
     String riderNickname,
     String riderPhoneNumber,
     List<String> riderActivityArea,
-    RiderTransportation riderTransportation,
+    Transportation transportation,
     String riderAccount,
     boolean riderIsDeleted
 ) {
     public Rider toEntity() {
         Rider rider = Rider.builder()
-                .riderId(riderId)
-                .riderEmail(riderEmail)
-                .riderNickname(riderNickname)
-                .riderPhoneNumber(riderPhoneNumber)
-                .riderActivityArea(riderActivityArea)
-                .riderTransportation(riderTransportation)
-                .riderAccount(riderAccount)
-                .riderIsDeleted(riderIsDeleted)
+                .id(riderId)
+                .email(riderEmail)
+                .nickname(riderNickname)
+                .phoneNumber(riderPhoneNumber)
+                .activityArea(riderActivityArea)
+                .transportation(transportation)
+                .account(riderAccount)
+                .deleted(riderIsDeleted)
                 .build();
         return rider;
     }
@@ -38,7 +37,7 @@ public record KafkaRiderDto(
                 ", riderNickname='" + riderNickname + '\'' +
                 ", riderPhoneNumber='" + riderPhoneNumber + '\'' +
                 ", riderActivityArea=" + riderActivityArea +
-                ", riderTransportation=" + riderTransportation +
+                ", riderTransportation=" + transportation +
                 ", riderAccount='" + riderAccount + '\'' +
                 ", riderIsDeleted=" + riderIsDeleted +
                 '}';

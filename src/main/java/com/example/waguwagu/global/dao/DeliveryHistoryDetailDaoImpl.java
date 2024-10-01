@@ -21,6 +21,6 @@ public class DeliveryHistoryDetailDaoImpl implements DeliveryHistoryDetailDao {
     @Override
     public List<DeliveryHistoryDetail> findByDeliveryHistoryId(Long deliveryHistoryId) {
         return deliveryHistoryDetailRepository
-                .findByDeliveryHistory_DeliveryHistoryIdAndDeliveryHistory_DeliveryHistoryIsDeletedFalseAndDeliveryHistoryDetailIsDeletedFalse(deliveryHistoryId);
+                .findByDeliveryHistory_IdAndDeliveryHistory_DeletedFalseAndDeletedFalse(deliveryHistoryId);
     }
 }

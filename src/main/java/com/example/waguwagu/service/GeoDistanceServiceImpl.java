@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class GeoDistanceServiceImpl implements GeoDistanceService {
-    private final int EARTH_RADIUS = 6371;
+    private static final int EARTH_RADIUS = 6371;
     double haversine(double val) {
         return Math.pow(Math.sin(val / 2), 2);
     }
@@ -25,6 +25,6 @@ public class GeoDistanceServiceImpl implements GeoDistanceService {
         double a = haversine(dLat) + Math.cos(startLat) * Math.cos(endLat) * haversine(dLong);
         double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 
-        return (double) (Math.floor(EARTH_RADIUS * c * 10) / 10);
+        return Math.floor(EARTH_RADIUS * c * 10) / 10;
     }
 }

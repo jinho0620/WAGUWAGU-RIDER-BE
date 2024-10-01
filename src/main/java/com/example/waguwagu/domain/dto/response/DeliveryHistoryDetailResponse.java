@@ -13,9 +13,9 @@ public record DeliveryHistoryDetailResponse(
 ) {
     public static DeliveryHistoryDetailResponse from(DeliveryHistoryDetail detail) {
         DeliveryHistoryDetailResponse res = new DeliveryHistoryDetailResponse(
-                detail.getDeliveryHistoryDetailId(),
+                detail.getId(),
                 detail.getDeliveryIncome(),
-                detail.getDeliveryHistoryDetailCreatedAt().toLocalDateTime(),
+                detail.getCreatedAt().toLocalDateTime(),
                 detail.getStoreName()
         );
         return res;

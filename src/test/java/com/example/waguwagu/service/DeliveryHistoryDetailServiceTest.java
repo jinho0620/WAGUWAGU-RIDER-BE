@@ -4,7 +4,7 @@ import com.example.waguwagu.domain.entity.DeliveryHistoryDetail;
 import com.example.waguwagu.domain.dto.request.DeliveryHistoryDetailRequest;
 import com.example.waguwagu.domain.dto.response.DeliveryHistoryDetailResponse;
 import com.example.waguwagu.domain.dto.response.DeliveryHistorySummaryResponse;
-import com.example.waguwagu.domain.type.RiderTransportation;
+import com.example.waguwagu.domain.type.Transportation;
 import com.example.waguwagu.global.dao.DeliveryHistoryDetailDao;
 import com.example.waguwagu.global.exception.DeliveryHistoryDetailNotFoundException;
 import com.example.waguwagu.kafka.KafkaStatus;
@@ -43,7 +43,7 @@ class DeliveryHistoryDetailServiceTest {
                         "Jinho",
                         "123-456-7890",
                         Arrays.asList("노원구", "도봉구", "서초구"),
-                        RiderTransportation.BICYCLE,
+                        Transportation.BICYCLE,
                         "123-456-789",
                         false), "insert");
         riderServiceImpl.saveRider(kafkaStatus);

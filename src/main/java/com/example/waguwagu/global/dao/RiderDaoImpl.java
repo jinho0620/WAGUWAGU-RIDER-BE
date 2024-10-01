@@ -15,7 +15,7 @@ public class RiderDaoImpl implements RiderDao {
     
     @Override
     public Rider findById(Long id) {
-        return riderRepository.findByRiderIdAndRiderIsDeletedFalse(id)
+        return riderRepository.findByIdAndDeletedFalse(id)
                 .orElseThrow(RiderNotFoundException::new);
     }
 
@@ -27,7 +27,7 @@ public class RiderDaoImpl implements RiderDao {
     @Override
     @Transactional
     public void update(KafkaRiderDto dto) {
-        Rider riderById = riderRepository.findByRiderIdAndRiderIsDeletedFalse(dto.riderId())
+        Rider riderById = riderRepository.findByIdAndDeletedFalse(dto.riderId())
                 .orElseThrow(RiderNotFoundException::new);
         System.out.println(riderById);
         riderById.update(dto);

@@ -1,6 +1,6 @@
 package com.example.waguwagu.domain.dto.request;
 
-import com.example.waguwagu.domain.type.RiderTransportation;
+import com.example.waguwagu.domain.type.Transportation;
 
 import java.util.List;
 
@@ -9,7 +9,7 @@ public record RiderUpdateRequest(
     String riderNickname,
     String riderPhoneNumber,
     List<String> riderActivityArea,
-    RiderTransportation riderTransportation,
+    Transportation transportation,
     String riderAccount
 ) {
 }

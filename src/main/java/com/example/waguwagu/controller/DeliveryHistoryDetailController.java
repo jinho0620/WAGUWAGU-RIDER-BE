@@ -29,7 +29,7 @@ public class DeliveryHistoryDetailController {
     public List<DeliveryHistoryDetailResponse> getByDeliveryHistoryId(@PathVariable Long deliveryHistoryId) {
         return deliveryHistoryDetailService.getByDeliveryHistoryId(deliveryHistoryId);
     }
-    @GetMapping("summary/delivery-history/{deliveryHistoryId}")
+    @GetMapping("/summary/delivery-history/{deliveryHistoryId}")
     @Operation(summary = "배달 내역 ID로 특정 날짜의 배달 횟수 및 배달 합산액 가져오기")
     public DeliveryHistorySummaryResponse getSummaryByDeliveryHistoryId(@PathVariable Long deliveryHistoryId) {
         return deliveryHistoryDetailService.getSummaryByDeliveryHistoryId(deliveryHistoryId);

@@ -2,7 +2,7 @@ package com.example.waguwagu.service;
 
 import com.example.waguwagu.domain.entity.DeliveryHistory;
 import com.example.waguwagu.domain.dto.response.DeliveryHistoryResponse;
-import com.example.waguwagu.domain.type.RiderTransportation;
+import com.example.waguwagu.domain.type.Transportation;
 import com.example.waguwagu.global.exception.DeliveryHistoryNotFoundException;
 import com.example.waguwagu.global.repository.DeliveryHistoryRepository;
 import com.example.waguwagu.kafka.dto.KafkaRiderDto;
@@ -38,7 +38,7 @@ class DeliveryHistoryServiceTest {
                         "Jinho",
                         "123-456-7890",
                         Arrays.asList("노원구", "도봉구", "서초구"),
-                        RiderTransportation.BICYCLE,
+                        Transportation.BICYCLE,
                         "123-456-789",
                         false), "insert");
         riderServiceImpl.saveRider(kafkaStatus);
@@ -52,7 +52,7 @@ class DeliveryHistoryServiceTest {
         DeliveryHistory savedHistory = deliveryHistoryRepository.findById(deliveryHistoryId).orElseThrow(DeliveryHistoryNotFoundException::new);
 
         assertNotNull(savedHistory);
-        assertEquals(200L, savedHistory.getRider().getRiderId());
+        assertEquals(200L, savedHistory.getRider().getId());
     }
 
     @Nested
@@ -90,7 +90,7 @@ class DeliveryHistoryServiceTest {
             DeliveryHistory deliveryHistory = deliveryHistoryService.getById(deliveryHistoryId);
 
             assertNotNull(deliveryHistory);
-            assertEquals(200L, deliveryHistory.getRider().getRiderId());
+            assertEquals(200L, deliveryHistory.getRider().getId());
         }
         @Test
         @DisplayName("Fail : should throw exception when delivery history doesn't exist")
