@@ -9,8 +9,6 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.sql.Timestamp;
-import java.time.Instant;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -30,7 +28,7 @@ public class DeliveryHistoryServiceImpl implements DeliveryHistoryService {
         try {
             // 오늘 날짜에 배달 내역이 있으면 있는 값으로 반환
             DeliveryHistory history = deliveryHistoryDao.findByCreatedAt(LocalDate.now());
-            return history.getDeliveryHistoryId();
+            return history.getId();
         } catch(DeliveryHistoryNotFoundException e) {
             // 오늘 날짜에 배달 내역이 없으면 새로 생성
             DeliveryHistory history = DeliveryHistory.builder()

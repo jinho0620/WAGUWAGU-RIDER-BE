@@ -13,9 +13,9 @@ public record DeliveryHistoryResponse (
 ) {
     public static DeliveryHistoryResponse from(DeliveryHistory history) {
         DeliveryHistoryResponse deliveryHistory = new DeliveryHistoryResponse(
-                history.getDeliveryHistoryId(),
-                history.getDeliveryHistoryCreatedAt(),
-                getDayOfWeekInKorean(history.getDeliveryHistoryCreatedAt().getDayOfWeek())
+                history.getId(),
+                history.getCreatedAt(),
+                getDayOfWeekInKorean(history.getCreatedAt().getDayOfWeek())
         );
         return deliveryHistory;
     }

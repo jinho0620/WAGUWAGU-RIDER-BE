@@ -48,6 +48,6 @@ public class RiderServiceImpl implements RiderService {
     @Transactional
     public void changeActivationState(Long id, ChangeActivationStateRequest req) {
         Rider rider = riderDao.findById(id);
-        rider.setRiderIsActive(req.onOff().equals("on"));
+        rider.setActive(req.onOff().equals("on"));
     }
 }

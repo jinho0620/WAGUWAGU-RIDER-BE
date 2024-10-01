@@ -7,9 +7,7 @@ import com.example.waguwagu.global.repository.DeliveryHistoryRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
-import java.sql.Timestamp;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Component
@@ -26,12 +24,12 @@ public class DeliveryHistoryDaoImpl implements DeliveryHistoryDao {
     public Long save(DeliveryHistory history) {
         System.out.println("DeliveryHistoryDaoImpl 까지 들어옴");
         DeliveryHistory savedHistory = deliveryHistoryRepository.save(history);
-        return savedHistory.getDeliveryHistoryId();
+        return savedHistory.getId();
     }
 
     @Override
     public List<DeliveryHistory> findByRiderId(Long riderId) {
-        List<DeliveryHistory> histories = deliveryHistoryRepository.findByRider_RiderIdAndRider_RiderIsDeletedFalseAndDeliveryHistoryIsDeletedFalse(riderId);
+        List<DeliveryHistory> histories = deliveryHistoryRepository.findByRider_IdAndRider_DeletedFalseAndDeletedFalse(riderId);
         return histories;
     }
 
@@ -43,7 +41,7 @@ public class DeliveryHistoryDaoImpl implements DeliveryHistoryDao {
     @Override
     public DeliveryHistory findByCreatedAt(LocalDate date) {
         DeliveryHistory history = deliveryHistoryRepository
-                .findByDeliveryHistoryCreatedAtAndDeliveryHistoryIsDeletedFalse(date)
+                .findByCreatedAtAndDeletedFalse(date)
                 .orElseThrow(DeliveryHistoryNotFoundException::new);
         return history;
     }
@@ -52,7 +50,7 @@ public class DeliveryHistoryDaoImpl implements DeliveryHistoryDao {
     public DeliveryHistory findByRiderIdOfToday(Long riderId) {
         DeliveryHistory history =
                 deliveryHistoryRepository
-                        .findByRider_RiderIdAndRider_RiderIsDeletedFalseAndDeliveryHistoryIsDeletedFalseAndDeliveryHistoryCreatedAt(riderId, LocalDate.now())
+                        .findByRider_IdAndRider_DeletedFalseAndDeletedFalseAndCreatedAt(riderId, LocalDate.now())
                         .orElseThrow(DeliveryHistoryNotFoundException::new);
         return history;
     }

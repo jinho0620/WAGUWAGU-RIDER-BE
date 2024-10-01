@@ -24,6 +24,8 @@ public class WaguwaguApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(WaguwaguApplication.class, args);
 		TimeZone.setDefault(TimeZone.getTimeZone("GMT+9:00"));
+
+
 	}
 
 //	@Bean

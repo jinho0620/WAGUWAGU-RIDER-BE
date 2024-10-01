@@ -4,7 +4,7 @@ import com.example.waguwagu.domain.entity.Rider;
 import com.example.waguwagu.domain.entity.RiderLocation;
 import com.example.waguwagu.domain.dto.request.RiderLocationRequest;
 import com.example.waguwagu.domain.dto.response.RiderLocationResponse;
-import com.example.waguwagu.domain.type.RiderTransportation;
+import com.example.waguwagu.domain.type.Transportation;
 import com.example.waguwagu.global.exception.RiderLocationNotFoundException;
 import com.example.waguwagu.global.repository.RiderLocationRedisRepository;
 import lombok.RequiredArgsConstructor;
@@ -34,8 +34,8 @@ public class RiderLocationServiceImpl implements RiderLocationService {
         log.info(location.toString());
         Rider rider = riderService.getById(location.getRiderId());
         log.info(rider.toString());
-        RiderTransportation riderTransportation = rider.getRiderTransportation();
-        RiderLocationResponse res = RiderLocationResponse.from(location, riderTransportation);
+        Transportation transportation = rider.getTransportation();
+        RiderLocationResponse res = RiderLocationResponse.from(location, transportation);
         return res;
     }
 

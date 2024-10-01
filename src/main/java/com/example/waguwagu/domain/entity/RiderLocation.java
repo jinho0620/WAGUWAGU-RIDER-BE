@@ -1,13 +1,10 @@
 package com.example.waguwagu.domain.entity;
 
-import com.example.waguwagu.domain.type.RiderTransportation;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import jakarta.persistence.Id;
 import lombok.*;
 import org.springframework.data.redis.core.RedisHash;
 
-import java.time.LocalDateTime;
-import java.util.List;
 import java.util.UUID;
 
 @Getter

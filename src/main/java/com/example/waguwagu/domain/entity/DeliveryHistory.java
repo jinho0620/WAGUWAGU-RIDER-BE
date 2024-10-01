@@ -3,10 +3,7 @@ package com.example.waguwagu.domain.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.sql.Time;
-import java.sql.Timestamp;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 @Entity
 @Builder
@@ -17,20 +14,20 @@ import java.time.LocalDateTime;
 public class DeliveryHistory {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "DELIVERY_HISTORY_ID")
-    private Long deliveryHistoryId;
+    @Column(name = "ID")
+    private Long id;
 
     @Builder.Default
-    @Column(name = "DELIVERY_HISTORY_CREATED_AT")
+    @Column(name = "CREATED_AT")
     // LocalDate로 변환해서 던져준다.
-    private LocalDate deliveryHistoryCreatedAt = LocalDate.now();
+    private LocalDate createdAt = LocalDate.now();
 
     @ManyToOne
     @JoinColumn(name = "RIDER_ID")
     private Rider rider;
 
     @Setter
-    @Column(name = "DELIVERY_HISTORY_IS_DELETED")
+    @Column(name = "DELETED")
     @Builder.Default
-    private boolean deliveryHistoryIsDeleted = false;
+    private boolean deleted = false;
 }

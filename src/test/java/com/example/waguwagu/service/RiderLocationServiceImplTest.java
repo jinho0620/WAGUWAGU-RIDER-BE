@@ -3,7 +3,7 @@ package com.example.waguwagu.service;
 import com.example.waguwagu.domain.dto.request.RiderLocationRequest;
 import com.example.waguwagu.domain.dto.response.RiderLocationResponse;
 import com.example.waguwagu.domain.entity.RiderLocation;
-import com.example.waguwagu.domain.type.RiderTransportation;
+import com.example.waguwagu.domain.type.Transportation;
 import com.example.waguwagu.global.exception.RiderLocationNotFoundException;
 import com.example.waguwagu.global.repository.RiderLocationRedisRepository;
 import com.example.waguwagu.kafka.KafkaStatus;
@@ -42,7 +42,7 @@ class RiderLocationServiceImplTest {
                         "Jinho",
                         "123-456-7890",
                         Arrays.asList("노원구", "도봉구", "서초구"),
-                        RiderTransportation.BICYCLE,
+                        Transportation.BICYCLE,
                         "123-456-789",
                         false), "insert");
         riderServiceImpl.saveRider(kafkaStatus);

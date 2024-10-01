@@ -1,7 +1,7 @@
 package com.example.waguwagu.kafka.dto;
 
 import com.example.waguwagu.domain.entity.DeliveryRequest;
-import com.example.waguwagu.domain.type.RiderTransportation;
+import com.example.waguwagu.domain.type.Transportation;
 
 import java.sql.Timestamp;
 import java.util.List;
@@ -18,7 +18,7 @@ public record KafkaDeliveryRequestDto(
         Timestamp due // 배달 몇 시까지 해야 하는지?
 ) {
 
-    public DeliveryRequest toEntity(List<RiderTransportation> transportations) {
+    public DeliveryRequest toEntity(List<Transportation> transportations) {
         DeliveryRequest deliveryRequest = DeliveryRequest.builder()
                 .id(orderId)
                 .orderId(orderId)
