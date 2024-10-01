@@ -91,18 +91,7 @@ public class DeliveryRequestServiceImpl implements DeliveryRequestService {
                     // 가게 부담 배달비 계산 (이동수단과 가게 ~ 고객 거리 고려)
                     int costByDistance = (int) (rider.getTransportation().costPerKm * deliveryRequest.getDistanceFromStoreToCustomer());
                     int totalCost = deliveryRequest.getDeliveryPay() + costByDistance;
-                    RiderAssignResponse response = new RiderAssignResponse(
-                            deliveryRequest.getId(),
-                            deliveryRequest.getOrderId(),
-                            deliveryRequest.getStoreName(),
-                            deliveryRequest.getStoreAddress(),
-                            totalCost,
-                            deliveryRequest.getDue().toLocalDateTime(),
-                            deliveryRequest.getDistanceFromStoreToCustomer(),
-                            Math.floor(distance.getValue()*10)/10,
-                            deliveryRequest.getStoreLatitude(),
-                            deliveryRequest.getStoreLongitude()
-                    );
+                    RiderAssignResponse response = RiderAssignResponse.from(deliveryRequest, distance, totalCost);
                     list.add(response);
                 }
             }
