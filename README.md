@@ -53,6 +53,11 @@ https://github.com/WAGUWAGUUU/WAGUWAGU
 ## 🔗 ERD<br>
 <img width="886" alt="image" src="https://github.com/user-attachments/assets/ce980faf-a0e8-43d1-93fb-6c5c3fe2e94e">
 
+##  <br>🔧 성능 개선 사항
+
+<img width="958" alt="image" src="https://github.com/user-attachments/assets/468fc1f6-6795-481c-8b2a-d5103384e512">
+
+
 
 ##  <br>🔧 트러블 슈팅
 
