@@ -15,7 +15,6 @@ import com.example.waguwagu.global.repository.RiderRepository;
 import com.example.waguwagu.global.util.GeoHashUtil;
 import com.example.waguwagu.kafka.KafkaStatus;
 import com.example.waguwagu.kafka.dto.KafkaDeliveryRequestDto;
-import com.example.waguwagu.kafka.dto.KafkaRiderDto;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.transaction.Transactional;
@@ -76,7 +75,7 @@ class DeliveryRequestServiceImplTest {
     class save {
         @Test
         @DisplayName("Success : when the distance is 0.7km")
-        void success_case1() {
+        void success_case1() throws JsonProcessingException {
             UUID orderId = UUID.randomUUID();
             KafkaDeliveryRequestDto dto = new KafkaDeliveryRequestDto(
                     orderId,
@@ -88,27 +87,39 @@ class DeliveryRequestServiceImplTest {
                     37.4868928106781,
                     new Timestamp(System.currentTimeMillis())
             );
-            KafkaStatus<KafkaDeliveryRequestDto> kafkaDto = new KafkaStatus<>(dto, "insert");
-            deliveryRequestServiceImpl.save(kafkaDto);
-            DeliveryRequest req = deliveryRequestRedisRepository.findById(orderId)
-                    .orElseThrow(DeliveryRequestNotFoundException::new);
 
-            assertNotNull(req);
-            assertEquals(orderId, req.getId());
+            KafkaStatus<KafkaDeliveryRequestDto> kafkaDto = new KafkaStatus<>(dto, "insert");
+            deliveryRequestServiceImpl.saveOrder(kafkaDto);
+            Map<Object, Object> storedLocations = redisTemplate.opsForHash().entries(REDIS_HASH_KEY); // Get all stored rider locations from Redis
+            List<DeliveryRequest> deliveryRequests = new ArrayList<>();
+            ObjectMapper objectMapper = new ObjectMapper();
+
+            for (Map.Entry<Object, Object> entry : storedLocations.entrySet()) {
+                System.out.println(entry.getValue().toString());
+                System.out.println(entry.getKey().toString());
+                DeliveryRequest savedDeliveryRequest = objectMapper.readValue(entry.getKey().toString(), DeliveryRequest.class);
+                deliveryRequests.add(savedDeliveryRequest);
+            }
+
+            DeliveryRequest lastOne = deliveryRequests.get(deliveryRequests.size()-1);
+
+
+            assertNotNull(lastOne);
+            assertEquals(orderId, lastOne.getId());
             assertEquals(Arrays.asList(
                             Transportation.CAR,
                             Transportation.MOTORBIKE,
                             Transportation.BICYCLE,
                             Transportation.WALK
                     ),
-                    req.getTransportations());
-            assertEquals(37.4868928106781, req.getStoreLatitude());
-            assertEquals(127.023662920981, req.getStoreLongitude());
+                    lastOne.getTransportations());
+            assertEquals(37.4868928106781, lastOne.getStoreLatitude());
+            assertEquals(127.023662920981, lastOne.getStoreLongitude());
         }
 
         @Test
         @DisplayName("Success : when the distance is 1km")
-        void success_case2() {
+        void success_case2() throws JsonProcessingException {
             UUID orderId = UUID.randomUUID();
             KafkaDeliveryRequestDto dto = new KafkaDeliveryRequestDto(
                     orderId,
@@ -121,26 +132,37 @@ class DeliveryRequestServiceImplTest {
                     new Timestamp(System.currentTimeMillis())
             );
             KafkaStatus<KafkaDeliveryRequestDto> kafkaDto = new KafkaStatus<>(dto, "insert");
-            deliveryRequestServiceImpl.save(kafkaDto);
-            DeliveryRequest req = deliveryRequestRedisRepository.findById(orderId)
-                    .orElseThrow(DeliveryRequestNotFoundException::new);
+            deliveryRequestServiceImpl.saveOrder(kafkaDto);
+            Map<Object, Object> storedLocations = redisTemplate.opsForHash().entries(REDIS_HASH_KEY); // Get all stored rider locations from Redis
+            List<DeliveryRequest> deliveryRequests = new ArrayList<>();
+            ObjectMapper objectMapper = new ObjectMapper();
 
-            assertNotNull(req);
-            assertEquals(orderId, req.getId());
+            for (Map.Entry<Object, Object> entry : storedLocations.entrySet()) {
+                System.out.println(entry.getValue().toString());
+                System.out.println(entry.getKey().toString());
+                DeliveryRequest savedDeliveryRequest = objectMapper.readValue(entry.getKey().toString(), DeliveryRequest.class);
+                deliveryRequests.add(savedDeliveryRequest);
+            }
+
+            DeliveryRequest lastOne = deliveryRequests.get(deliveryRequests.size()-1);
+
+
+            assertNotNull(lastOne);
+            assertEquals(orderId, lastOne.getId());
             assertEquals(Arrays.asList(
                     Transportation.CAR,
                     Transportation.MOTORBIKE,
                     Transportation.BICYCLE,
                     Transportation.WALK
                     ),
-                    req.getTransportations());
-            assertEquals(37.4868928106781, req.getStoreLatitude());
-            assertEquals(127.023662920981, req.getStoreLongitude());
+                    lastOne.getTransportations());
+            assertEquals(37.4868928106781, lastOne.getStoreLatitude());
+            assertEquals(127.023662920981, lastOne.getStoreLongitude());
         }
 
         @Test
         @DisplayName("Success : when the distance is 2.3km")
-        void success_case3() {
+        void success_case3() throws JsonProcessingException {
             UUID orderId = UUID.randomUUID();
             KafkaDeliveryRequestDto dto = new KafkaDeliveryRequestDto(
                     orderId,
@@ -153,25 +175,36 @@ class DeliveryRequestServiceImplTest {
                     new Timestamp(System.currentTimeMillis())
             );
             KafkaStatus<KafkaDeliveryRequestDto> kafkaDto = new KafkaStatus<>(dto, "insert");
-            deliveryRequestServiceImpl.save(kafkaDto);
-            DeliveryRequest req = deliveryRequestRedisRepository.findById(orderId)
-                    .orElseThrow(DeliveryRequestNotFoundException::new);
+            deliveryRequestServiceImpl.saveOrder(kafkaDto);
+            Map<Object, Object> storedLocations = redisTemplate.opsForHash().entries(REDIS_HASH_KEY); // Get all stored rider locations from Redis
+            List<DeliveryRequest> deliveryRequests = new ArrayList<>();
+            ObjectMapper objectMapper = new ObjectMapper();
 
-            assertNotNull(req);
-            assertEquals(orderId, req.getId());
+            for (Map.Entry<Object, Object> entry : storedLocations.entrySet()) {
+                System.out.println(entry.getValue().toString());
+                System.out.println(entry.getKey().toString());
+                DeliveryRequest savedDeliveryRequest = objectMapper.readValue(entry.getKey().toString(), DeliveryRequest.class);
+                deliveryRequests.add(savedDeliveryRequest);
+            }
+
+            DeliveryRequest lastOne = deliveryRequests.get(deliveryRequests.size()-1);
+
+
+            assertNotNull(lastOne);
+            assertEquals(orderId, lastOne.getId());
             assertEquals(Arrays.asList(
                     Transportation.CAR,
                     Transportation.MOTORBIKE,
                     Transportation.BICYCLE
                     ),
-                    req.getTransportations());
-            assertEquals(37.4868928106781, req.getStoreLatitude());
-            assertEquals(127.023662920981, req.getStoreLongitude());
+                    lastOne.getTransportations());
+            assertEquals(37.4868928106781, lastOne.getStoreLatitude());
+            assertEquals(127.023662920981, lastOne.getStoreLongitude());
         }
 
         @Test
         @DisplayName("Success : when the distance is 2.5km")
-        void success_case4() {
+        void success_case4() throws JsonProcessingException {
             UUID orderId = UUID.randomUUID();
             KafkaDeliveryRequestDto dto = new KafkaDeliveryRequestDto(
                     orderId,
@@ -184,25 +217,36 @@ class DeliveryRequestServiceImplTest {
                     new Timestamp(System.currentTimeMillis())
             );
             KafkaStatus<KafkaDeliveryRequestDto> kafkaDto = new KafkaStatus<>(dto, "insert");
-            deliveryRequestServiceImpl.save(kafkaDto);
-            DeliveryRequest req = deliveryRequestRedisRepository.findById(orderId)
-                    .orElseThrow(DeliveryRequestNotFoundException::new);
+            deliveryRequestServiceImpl.saveOrder(kafkaDto);
+            Map<Object, Object> storedLocations = redisTemplate.opsForHash().entries(REDIS_HASH_KEY); // Get all stored rider locations from Redis
+            List<DeliveryRequest> deliveryRequests = new ArrayList<>();
+            ObjectMapper objectMapper = new ObjectMapper();
 
-            assertNotNull(req);
-            assertEquals(orderId, req.getId());
+            for (Map.Entry<Object, Object> entry : storedLocations.entrySet()) {
+                System.out.println(entry.getValue().toString());
+                System.out.println(entry.getKey().toString());
+                DeliveryRequest savedDeliveryRequest = objectMapper.readValue(entry.getKey().toString(), DeliveryRequest.class);
+                deliveryRequests.add(savedDeliveryRequest);
+            }
+
+            DeliveryRequest lastOne = deliveryRequests.get(deliveryRequests.size()-1);
+
+
+            assertNotNull(lastOne);
+            assertEquals(orderId, lastOne.getId());
             assertEquals(Arrays.asList(
                     Transportation.CAR,
                     Transportation.MOTORBIKE,
                     Transportation.BICYCLE
             ),
-                    req.getTransportations());
-            assertEquals(37.4868928106781, req.getStoreLatitude());
-            assertEquals(127.023662920981, req.getStoreLongitude());
+                    lastOne.getTransportations());
+            assertEquals(37.4868928106781, lastOne.getStoreLatitude());
+            assertEquals(127.023662920981, lastOne.getStoreLongitude());
         }
 
         @Test
         @DisplayName("Success : when the distance is 4.5km")
-        void success_case5() {
+        void success_case5() throws JsonProcessingException {
             UUID orderId = UUID.randomUUID();
             KafkaDeliveryRequestDto dto = new KafkaDeliveryRequestDto(
                     orderId,
@@ -215,23 +259,33 @@ class DeliveryRequestServiceImplTest {
                     new Timestamp(System.currentTimeMillis())
             );
             KafkaStatus<KafkaDeliveryRequestDto> kafkaDto = new KafkaStatus<>(dto, "insert");
-            deliveryRequestServiceImpl.save(kafkaDto);
-            DeliveryRequest req = deliveryRequestRedisRepository.findById(orderId)
-                    .orElseThrow(DeliveryRequestNotFoundException::new);
+            deliveryRequestServiceImpl.saveOrder(kafkaDto);
+            Map<Object, Object> storedLocations = redisTemplate.opsForHash().entries(REDIS_HASH_KEY); // Get all stored rider locations from Redis
+            List<DeliveryRequest> deliveryRequests = new ArrayList<>();
+            ObjectMapper objectMapper = new ObjectMapper();
 
-            assertNotNull(req);
-            assertEquals(orderId, req.getId());
+            for (Map.Entry<Object, Object> entry : storedLocations.entrySet()) {
+                System.out.println(entry.getValue().toString());
+                System.out.println(entry.getKey().toString());
+                DeliveryRequest savedDeliveryRequest = objectMapper.readValue(entry.getKey().toString(), DeliveryRequest.class);
+                deliveryRequests.add(savedDeliveryRequest);
+            }
+
+            DeliveryRequest lastOne = deliveryRequests.get(deliveryRequests.size()-1);
+
+            assertNotNull(lastOne);
+            assertEquals(orderId, lastOne.getId());
             assertEquals(Arrays.asList(
                     Transportation.CAR,
                     Transportation.MOTORBIKE
                     )
-                    , req.getTransportations());
-            assertEquals(37.4868928106781, req.getStoreLatitude());
-            assertEquals(127.023662920981, req.getStoreLongitude());
+                    , lastOne.getTransportations());
+            assertEquals(37.4868928106781, lastOne.getStoreLatitude());
+            assertEquals(127.023662920981, lastOne.getStoreLongitude());
         }
         @Test
         @DisplayName("Success : when the distance is 5km")
-        void success_case6() {
+        void success_case6() throws JsonProcessingException {
             UUID orderId = UUID.randomUUID();
             KafkaDeliveryRequestDto dto = new KafkaDeliveryRequestDto(
                     orderId,
@@ -244,22 +298,33 @@ class DeliveryRequestServiceImplTest {
                     new Timestamp(System.currentTimeMillis())
             );
             KafkaStatus<KafkaDeliveryRequestDto> kafkaDto = new KafkaStatus<>(dto, "insert");
-            deliveryRequestServiceImpl.save(kafkaDto);
-            DeliveryRequest req = deliveryRequestRedisRepository.findById(orderId)
-                    .orElseThrow(DeliveryRequestNotFoundException::new);
+            deliveryRequestServiceImpl.saveOrder(kafkaDto);
+            Map<Object, Object> storedLocations = redisTemplate.opsForHash().entries(REDIS_HASH_KEY); // Get all stored rider locations from Redis
+            List<DeliveryRequest> deliveryRequests = new ArrayList<>();
+            ObjectMapper objectMapper = new ObjectMapper();
 
-            assertNotNull(req);
-            assertEquals(orderId, req.getId());
+            for (Map.Entry<Object, Object> entry : storedLocations.entrySet()) {
+                System.out.println(entry.getValue().toString());
+                System.out.println(entry.getKey().toString());
+                DeliveryRequest savedDeliveryRequest = objectMapper.readValue(entry.getKey().toString(), DeliveryRequest.class);
+                deliveryRequests.add(savedDeliveryRequest);
+            }
+
+            DeliveryRequest lastOne = deliveryRequests.get(deliveryRequests.size()-1);
+
+
+            assertNotNull(lastOne);
+            assertEquals(orderId, lastOne.getId());
             assertEquals(Arrays.asList(
                     Transportation.CAR,
                     Transportation.MOTORBIKE
-            ), req.getTransportations());
-            assertEquals(37.4868928106781, req.getStoreLatitude());
-            assertEquals(127.023662920981, req.getStoreLongitude());
+            ), lastOne.getTransportations());
+            assertEquals(37.4868928106781, lastOne.getStoreLatitude());
+            assertEquals(127.023662920981, lastOne.getStoreLongitude());
         }
         @Test
         @DisplayName("Success : when the distance is 10km")
-        void success_case7() {
+        void success_case7() throws JsonProcessingException {
             UUID orderId = UUID.randomUUID();
             KafkaDeliveryRequestDto dto = new KafkaDeliveryRequestDto(
                     orderId,
@@ -272,15 +337,26 @@ class DeliveryRequestServiceImplTest {
                     new Timestamp(System.currentTimeMillis())
             );
             KafkaStatus<KafkaDeliveryRequestDto> kafkaDto = new KafkaStatus<>(dto, "insert");
-            deliveryRequestServiceImpl.save(kafkaDto);
-            DeliveryRequest req = deliveryRequestRedisRepository.findById(orderId)
-                    .orElseThrow(DeliveryRequestNotFoundException::new);
+            deliveryRequestServiceImpl.saveOrder(kafkaDto);
+            Map<Object, Object> storedLocations = redisTemplate.opsForHash().entries(REDIS_HASH_KEY); // Get all stored rider locations from Redis
+            List<DeliveryRequest> deliveryRequests = new ArrayList<>();
+            ObjectMapper objectMapper = new ObjectMapper();
 
-            assertNotNull(req);
-            assertEquals(orderId, req.getId());
-            assertNull(req.getTransportations());
-            assertEquals(37.4868928106781, req.getStoreLatitude());
-            assertEquals(127.023662920981, req.getStoreLongitude());
+            for (Map.Entry<Object, Object> entry : storedLocations.entrySet()) {
+                System.out.println(entry.getValue().toString());
+                System.out.println(entry.getKey().toString());
+                DeliveryRequest savedDeliveryRequest = objectMapper.readValue(entry.getKey().toString(), DeliveryRequest.class);
+                deliveryRequests.add(savedDeliveryRequest);
+            }
+
+            DeliveryRequest lastOne = deliveryRequests.get(deliveryRequests.size()-1);
+
+
+            assertNotNull(lastOne);
+            assertEquals(orderId, lastOne.getId());
+            assertNull(lastOne.getTransportations());
+            assertEquals(37.4868928106781, lastOne.getStoreLatitude());
+            assertEquals(127.023662920981, lastOne.getStoreLongitude());
         }
     }
 

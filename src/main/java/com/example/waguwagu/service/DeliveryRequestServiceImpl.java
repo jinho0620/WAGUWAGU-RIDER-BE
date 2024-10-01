@@ -59,10 +59,7 @@ public class DeliveryRequestServiceImpl implements DeliveryRequestService {
     private static final String REDIS_HASH_KEY = "riderLocations";
     private static final int GEO_HASH_PRECISION = 7; // 150m X 150m
 
-    @Override
     public List<RiderAssignResponse> assignRider(Long riderId, RiderAssignRequest req) {
-        StopWatch stopWatch = new StopWatch();
-        stopWatch.start();
         Rider rider = riderService.getById(riderId);
         if (rider.isNotActive()) throw new RiderNotActiveException(); // rider가 활성화 상태인지 확인
         List<DeliveryRequest> deliveryRequests = deliveryRequestRedisRepository.findAll();
@@ -110,24 +107,8 @@ public class DeliveryRequestServiceImpl implements DeliveryRequestService {
                 }
             }
         }
-        stopWatch.stop();
-        long elapsedTime = stopWatch.getTotalTimeMillis();
-        System.out.println("코드 실행 시간: " + elapsedTime + "밀리초 with 거리 계산");
 //         요청 목록 return
         return list;
-    }
-
-    @KafkaListener(topics = "order-topic", id = "delivery")
-    public void save(KafkaStatus<KafkaDeliveryRequestDto> dto) {
-        if (dto.status().equals("insert")) {
-            log.info(dto.toString());
-            log.info("Order data successfully received for orderId: " + dto.data().orderId());
-            // 가게 ~ 고객 거리에 따라 배달 가능한 이동 수단 제한
-            List<Transportation> transportations = Transportation
-                    .chooseTransportationByDistance(dto.data().distanceFromStoreToCustomer());
-            DeliveryRequest deliveryRequest = dto.data().toEntity(transportations);
-            deliveryRequestRedisRepository.save(deliveryRequest);
-        }
     }
 
     @KafkaListener(topics = "order-topic", id = "delivery")
@@ -195,7 +176,6 @@ public class DeliveryRequestServiceImpl implements DeliveryRequestService {
                 }
             }
         }
-
         return nearbyOrders;
     }
 
