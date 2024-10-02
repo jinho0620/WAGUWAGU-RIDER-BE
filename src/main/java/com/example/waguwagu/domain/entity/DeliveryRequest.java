@@ -25,6 +25,7 @@ public class DeliveryRequest {
     private UUID orderId;
     private String storeName; // 가게 이름
     private String storeAddress; // 가게 주소
+    @Setter
     private int deliveryPay; // 배달 수당
     private double distanceFromStoreToCustomer; // 가게~고객 거리
     private List<Transportation> transportations; // 라이더 이동 수단 (가게~고객 거리에 따라 결정됨), 0~1km 전부 / 1~2.5km 자전거, 오토바이, 자동차 / 2.5km 이상 : 오토바이, 자동차 /
