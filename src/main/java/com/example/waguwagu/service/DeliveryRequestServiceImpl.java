@@ -32,9 +32,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-@Slf4j
-@Service
-@RequiredArgsConstructor
 
 /* 요청이 올 때마다 DB 전체를 뒤지는 것은 비효율적이다. 요청이 들어올 때마다, 라이더들을 추려내서 쏴주는 것이 가장 효율적이다. -> socket 이용
 1. 현재 활동 범위 안에 있다면 gps로 위, 경도를 쏜다. @front -> 라이더가 활동 범위 안에 있는지
@@ -44,6 +41,9 @@ import java.util.Map;
 5. 걸러낸 각 요청들에서 라이더~가게 사이의 거리를 계산 @back
 6. 가게 이름/주소, 배달료, 배달 목표 시간, 가게~라이더 사이 거리, 가게~고객 거리를 라이더한테 줌 @back
 */
+@Slf4j
+@Service
+@RequiredArgsConstructor
 public class DeliveryRequestServiceImpl implements DeliveryRequestService {
     private final DeliveryRequestRedisRepository deliveryRequestRedisRepository;
     private final RiderService riderService;
@@ -54,6 +54,46 @@ public class DeliveryRequestServiceImpl implements DeliveryRequestService {
     private static final int MAX_DELIVERABLE_DISTANCE = 5;
     private static final String REDIS_HASH_KEY = "riderLocations";
     private static final int GEO_HASH_PRECISION = 7; // 150m X 150m
+
+    public List<DeliveryRequest> findNearByOrders(Long riderId, RiderAssignRequest req) throws JsonProcessingException {
+        Rider rider = riderService.getById(riderId);
+        if (rider.isNotActive()) throw new RiderNotActiveException(); // rider가 활성화 상태인지 확인
+        GeoHash centerGeoHash = GeoHash.withCharacterPrecision(req.latitude(), req.longitude(), GEO_HASH_PRECISION);
+        // 라이더 기준 가로, 세로 150m X 150m 로 격자(bounding box) 생성
+        BoundingBox searchArea = centerGeoHash.getBoundingBox();
+        // 라이더 기준 가로, 세로 5km 추가하여 bounding box 확장
+        BoundingBox expandedBox = GeoHashUtil.expandBoundingBox(searchArea, req.latitude());
+        // bounding box 안에서 150m 간격으로 geoHash 추출
+        List<String> nearByHashes = GeoHashUtil.coverBoundingBox(expandedBox, GEO_HASH_PRECISION);
+        log.info(nearByHashes.toString());
+        List<DeliveryRequest> nearbyOrders = new ArrayList<>();
+        // REDIS_HASH_KEY(rider_locations)를 key로 가진 데이터 모두 가져오기 @redis
+        Map<Object, Object> storedDeliveryRequests = redisTemplate.opsForHash().entries(REDIS_HASH_KEY);
+        ObjectMapper objectMapper = new ObjectMapper();
+        // redis에 저장되어있는 각 배달 건 확인
+        for (Map.Entry<Object, Object> entry : storedDeliveryRequests.entrySet()) {
+            String storedGeoHash = (String) entry.getValue(); // 배달 건의 geohash값 가져오기
+            log.info(entry.toString());
+            // 라이더의 5km 이내에 있는 geohash 범위에 배달 건의 geohash가 포함되는지 검증
+            if (nearByHashes.contains(storedGeoHash)) {
+                DeliveryRequest deliveryRequest = objectMapper.readValue(entry.getKey().toString(), DeliveryRequest.class);
+                // 가게의 구(ex. 노원구) 꺼내기, storeAddress 예시: "서울시 노원구 동일로"
+                String[] storeAddress = deliveryRequest.getStoreAddress().split(" ");
+                String storeDistrict = storeAddress[1];
+                // 가게가 내 활동 범위에 있는지, 배달 요청에 내 이동수단이 포함되는지 그리고 이미 라이더가 배정되었는지 검증
+                if (deliveryRequest.isNotAssigned() && rider.getActivityArea().contains(storeDistrict)
+                        && deliveryRequest.getTransportations().contains(rider.getTransportation())) {
+                    // 가게 부담 배달비 계산 (이동수단과 가게 ~ 고객 거리 고려)
+                    int costByDistance = (int) (rider.getTransportation().costPerKm * deliveryRequest.getDistanceFromStoreToCustomer());
+                    int totalCost = deliveryRequest.getDeliveryPay() + costByDistance;
+                    deliveryRequest.setDeliveryPay(totalCost);
+                    nearbyOrders.add(deliveryRequest);
+                }
+            }
+        }
+        return nearbyOrders;
+    }
+
 
     public List<RiderAssignResponse> assignRider(Long riderId, RiderAssignRequest req) {
         Rider rider = riderService.getById(riderId);
@@ -115,44 +155,6 @@ public class DeliveryRequestServiceImpl implements DeliveryRequestService {
         }
     }
 
-    public List<DeliveryRequest> findNearByOrders(Long riderId, RiderAssignRequest req) throws JsonProcessingException {
-        Rider rider = riderService.getById(riderId);
-        if (rider.isNotActive()) throw new RiderNotActiveException(); // rider가 활성화 상태인지 확인
-        GeoHash centerGeoHash = GeoHash.withCharacterPrecision(req.latitude(), req.longitude(), GEO_HASH_PRECISION);
-        // 라이더 기준 가로, 세로 150m X 150m 로 격자(bounding box) 생성
-        BoundingBox searchArea = centerGeoHash.getBoundingBox();
-        // 라이더 기준 가로, 세로 5km 추가하여 bounding box 확장
-        BoundingBox expandedBox = GeoHashUtil.expandBoundingBox(searchArea, req.latitude());
-        // bounding box 안에서 150m 간격으로 geoHash 추출
-        List<String> nearByHashes = GeoHashUtil.coverBoundingBox(expandedBox, GEO_HASH_PRECISION);
-        log.info(nearByHashes.toString());
-        List<DeliveryRequest> nearbyOrders = new ArrayList<>();
-        // REDIS_HASH_KEY(rider_locations)를 key로 가진 데이터 모두 가져오기 @redis
-        Map<Object, Object> storedDeliveryRequests = redisTemplate.opsForHash().entries(REDIS_HASH_KEY);
-        ObjectMapper objectMapper = new ObjectMapper();
-        // redis에 저장되어있는 각 배달 건 확인
-        for (Map.Entry<Object, Object> entry : storedDeliveryRequests.entrySet()) {
-            String storedGeoHash = (String) entry.getValue(); // 배달 건의 geohash값 가져오기
-            log.info(entry.toString());
-            // 라이더의 5km 이내에 있는 geohash 범위에 배달 건의 geohash가 포함되는지 검증
-            if (nearByHashes.contains(storedGeoHash)) {
-                DeliveryRequest deliveryRequest = objectMapper.readValue(entry.getKey().toString(), DeliveryRequest.class);
-                // 가게의 구(ex. 노원구) 꺼내기, storeAddress 예시: "서울시 노원구 동일로"
-                String[] storeAddress = deliveryRequest.getStoreAddress().split(" ");
-                String storeDistrict = storeAddress[1];
-                // 가게가 내 활동 범위에 있는지, 배달 요청에 내 이동수단이 포함되는지 그리고 이미 라이더가 배정되었는지 검증
-                if (deliveryRequest.isNotAssigned() && rider.getActivityArea().contains(storeDistrict)
-                        && deliveryRequest.getTransportations().contains(rider.getTransportation())) {
-                    // 가게 부담 배달비 계산 (이동수단과 가게 ~ 고객 거리 고려)
-                    int costByDistance = (int) (rider.getTransportation().costPerKm * deliveryRequest.getDistanceFromStoreToCustomer());
-                    int totalCost = deliveryRequest.getDeliveryPay() + costByDistance;
-                    deliveryRequest.setDeliveryPay(totalCost);
-                    nearbyOrders.add(deliveryRequest);
-                }
-            }
-        }
-        return nearbyOrders;
-    }
 
 
     @Override
