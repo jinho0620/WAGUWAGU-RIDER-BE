@@ -3,12 +3,10 @@ package com.example.waguwagu.service;
 import ch.hsr.geohash.BoundingBox;
 import ch.hsr.geohash.GeoHash;
 import com.example.waguwagu.domain.dto.request.RiderAssignRequest;
-import com.example.waguwagu.domain.dto.response.NearByOrderResponse;
 import com.example.waguwagu.domain.dto.response.RiderAssignResponse;
 import com.example.waguwagu.domain.entity.DeliveryRequest;
 import com.example.waguwagu.domain.entity.Rider;
 import com.example.waguwagu.domain.type.Transportation;
-import com.example.waguwagu.global.exception.DeliveryRequestNotFoundException;
 import com.example.waguwagu.global.exception.RiderNotActiveException;
 import com.example.waguwagu.global.repository.DeliveryRequestRedisRepository;
 import com.example.waguwagu.global.util.GeoHashUtil;
@@ -28,13 +26,11 @@ import org.springframework.data.redis.core.GeoOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StopWatch;
 
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 @Slf4j
 @Service
@@ -119,7 +115,7 @@ public class DeliveryRequestServiceImpl implements DeliveryRequestService {
         }
     }
 
-    public List<NearByOrderResponse> findNearByOrders(Long riderId, RiderAssignRequest req) throws JsonProcessingException {
+    public List<DeliveryRequest> findNearByOrders(Long riderId, RiderAssignRequest req) throws JsonProcessingException {
         Rider rider = riderService.getById(riderId);
         if (rider.isNotActive()) throw new RiderNotActiveException(); // rider가 활성화 상태인지 확인
         GeoHash centerGeoHash = GeoHash.withCharacterPrecision(req.latitude(), req.longitude(), GEO_HASH_PRECISION);
@@ -130,7 +126,7 @@ public class DeliveryRequestServiceImpl implements DeliveryRequestService {
         // bounding box 안에서 150m 간격으로 geoHash 추출
         List<String> nearByHashes = GeoHashUtil.coverBoundingBox(expandedBox, GEO_HASH_PRECISION);
         log.info(nearByHashes.toString());
-        List<NearByOrderResponse> nearbyOrders = new ArrayList<>();
+        List<DeliveryRequest> nearbyOrders = new ArrayList<>();
         // REDIS_HASH_KEY(rider_locations)를 key로 가진 데이터 모두 가져오기 @redis
         Map<Object, Object> storedDeliveryRequests = redisTemplate.opsForHash().entries(REDIS_HASH_KEY);
         ObjectMapper objectMapper = new ObjectMapper();
@@ -150,18 +146,8 @@ public class DeliveryRequestServiceImpl implements DeliveryRequestService {
                     // 가게 부담 배달비 계산 (이동수단과 가게 ~ 고객 거리 고려)
                     int costByDistance = (int) (rider.getTransportation().costPerKm * deliveryRequest.getDistanceFromStoreToCustomer());
                     int totalCost = deliveryRequest.getDeliveryPay() + costByDistance;
-                    NearByOrderResponse response = new NearByOrderResponse(
-                            deliveryRequest.getId(),
-                            deliveryRequest.getOrderId(),
-                            deliveryRequest.getStoreName(),
-                            deliveryRequest.getStoreAddress(),
-                            totalCost,
-                            deliveryRequest.getDue().toLocalDateTime(),
-                            deliveryRequest.getDistanceFromStoreToCustomer(),
-                            deliveryRequest.getStoreLatitude(),
-                            deliveryRequest.getStoreLongitude()
-                    );
-                    nearbyOrders.add(response);
+                    deliveryRequest.setDeliveryPay(totalCost);
+                    nearbyOrders.add(deliveryRequest);
                 }
             }
         }
@@ -169,20 +155,9 @@ public class DeliveryRequestServiceImpl implements DeliveryRequestService {
     }
 
 
-
-
     @Override
-    public void deleteById(UUID id) {
-        DeliveryRequest deliveryRequest = deliveryRequestRedisRepository.findById(id)
-                .orElseThrow(DeliveryRequestNotFoundException::new);
-        deliveryRequestRedisRepository.deleteById(id);
+    public void deleteDeliveryRequest(String deliveryRequestJson) {
+        redisTemplate.opsForHash().delete(REDIS_HASH_KEY, deliveryRequestJson);
     }
 
-    @Override
-    public void updateRiderAssigned(UUID id) {
-        DeliveryRequest deliveryRequest = deliveryRequestRedisRepository.findById(id)
-                .orElseThrow(DeliveryRequestNotFoundException::new);
-        deliveryRequest.setAssigned(!deliveryRequest.isAssigned());
-        deliveryRequestRedisRepository.save(deliveryRequest);
-    }
 }
