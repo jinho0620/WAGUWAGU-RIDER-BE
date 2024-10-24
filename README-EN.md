@@ -85,7 +85,7 @@ https://github.com/WAGUWAGUUU/WAGUWAGU
 <br>
 
 **4. Jenkins pipeline stuck in infinite loading<br><br>**
-> * Phenomenon: : ```Started by GitHub push by jinho9482 [Pipeline] 
+> * Symptom: : ```Started by GitHub push by jinho9482 [Pipeline] 
 Start of Pipeline [Pipeline] 
 node Still waiting to schedule task Waiting for next available executor```
 <br><br>
@@ -119,7 +119,7 @@ node Still waiting to schedule task Waiting for next available executor```
 >                 name: wgwg-auth-server
 >                 port:
 >                   number: 8080
->           // Move root path to the end    
+>           # Move root path to the end    
 >           - path: / 
 >             pathType: Prefix
 >             backend:
