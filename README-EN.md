@@ -45,9 +45,12 @@ https://github.com/WAGUWAGUUU/WAGUWAGU
 
 <br><br>
 ## 🧾 Data Flow Diagram<br><br>
-<img width="839" alt="image" src="https://github.com/user-attachments/assets/6cf60977-d629-45f1-b93b-d206ef220b57"><br>
-<img width="845" alt="image" src="https://github.com/user-attachments/assets/e00e47e9-047b-4077-ac90-d73307a5ba3c"><br>
-<img width="845" alt="image" src="https://github.com/user-attachments/assets/3f992d04-efe7-45a2-81d3-5f2edeb797e9">
+<img width="902" alt="image" src="https://github.com/user-attachments/assets/60cacfe4-a8a1-485b-a0ff-3ff7e74321cb">
+<br>
+<img width="885" alt="image" src="https://github.com/user-attachments/assets/44fdfa5a-2ade-4e62-9963-7f2417cfddc1">
+<br>
+<img width="902" alt="image" src="https://github.com/user-attachments/assets/965243bb-baf2-438a-896b-a5cba4a26082">
+
 
 
 ## 🔗 ERD<br>
@@ -86,7 +89,7 @@ Start of Pipeline [Pipeline]
 node Still waiting to schedule task Waiting for next available executor```
 <br><br>
 > * Cause: Insufficient disk space in the /var/jenkins_home folder within the Jenkins Docker container.<br><br>
-> * Temporary Solution: Manually trigger the pipeline to run.<br><br> <img width="1226" alt="image" src="https://github.com/user-attachments/assets/3ca8f4b0-43df-4608-b076-5a22a810530b"><br><br>
+> * Temporary Solution: Manually trigger the pipeline to run.<br><br>
 > <img width="1226" alt="image" src="https://github.com/user-attachments/assets/3ca8f4b0-43df-4608-b076-5a22a810530b"><br><br>
 > * Permanent Solution: Configure the pipeline to delete logs from the folder after execution using the "Workspace Cleanup" plugin.
 
