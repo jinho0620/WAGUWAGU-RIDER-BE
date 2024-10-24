@@ -40,8 +40,8 @@ https://github.com/WAGUWAGUUU/WAGUWAGU
    
 ## <br>🧾 API Documentation (with Swagger API)<br><br>
 
-<img width="1085" alt="image" src="https://github.com/user-attachments/assets/4ebb2ae2-7bbb-41c7-ac1b-38759efd342b">
-<img width="1085" alt="image" src="https://github.com/user-attachments/assets/a584ba9c-c81a-42cb-a5ac-0a80ab9a693c">
+<img width="1071" alt="image" src="https://github.com/user-attachments/assets/79203c19-0e0c-4164-b0c8-c549cd63ff2d">
+<img width="1082" alt="image" src="https://github.com/user-attachments/assets/0cb0abf2-15af-49e9-9226-945731e9a22f">
 
 <br><br>
 ## 🧾 Data Flow Diagram<br><br>
@@ -69,7 +69,7 @@ https://github.com/WAGUWAGUUU/WAGUWAGU
 <br>
 
 **2. Encountering -bash: export: 'postgres-user=root': not a valid identifier error when running export postgres-user=root in a Linux environment.<br><br>**
-> * 원인 : Cause: The dash (-) cannot be used in environment variable names in Linux; use an underscore (_) instead.<br><br>
+> * Cause: The dash (-) cannot be used in environment variable names in Linux; use an underscore (_) instead.<br><br>
 > * Solution: Use export postgres_user=root, and verify with echo $postgres_user to confirm it returns root.
 
 <br>
