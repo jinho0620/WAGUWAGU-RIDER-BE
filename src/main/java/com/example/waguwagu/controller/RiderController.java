@@ -12,10 +12,10 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/riders/accounts")
-@Tag(name = "배달 기사")
+@Tag(name = "Delivery Rider")
 public class RiderController {
     private final RiderService riderService;
-    // kafka로 rider 객체 받음
+    // Receive rider object via Kafka
 
 //    @PostMapping
 //    @ResponseStatus(HttpStatus.CREATED)
@@ -24,13 +24,13 @@ public class RiderController {
 //    }
 
     @GetMapping("/{id}")
-    @Operation(summary = "ID로 배달 기사 정보 가져오기")
+    @Operation(summary = "Retrieve delivery rider information by ID")
     public Rider getById(@PathVariable Long id) {
         return riderService.getById(id);
     }
 
     @PutMapping("/{id}/activation")
-    @Operation(summary = "계정 활성화 상태 변경")
+    @Operation(summary = "Change account activation state")
     public void changeActivationState(@PathVariable Long id, @RequestBody ChangeActivationStateRequest req) {
         riderService.changeActivationState(id, req);
     }

@@ -27,19 +27,19 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
 
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 
-/* 요청이 올 때마다 DB 전체를 뒤지는 것은 비효율적이다. 요청이 들어올 때마다, 라이더들을 추려내서 쏴주는 것이 가장 효율적이다. -> socket 이용
-1. 현재 활동 범위 안에 있다면 gps로 위, 경도를 쏜다. @front -> 라이더가 활동 범위 안에 있는지
-2. DB에서 목록을 가져옴 @back
-3. 가게가 활동 범위 안에 있는지 검증 @back
-4. 이동 수단이 라이더의 것과 맞는 것만 추려냄 -> 여기까지 진행하면 내가 배달할 권리가 있는 것들을 추려냄 @back
-5. 걸러낸 각 요청들에서 라이더~가게 사이의 거리를 계산 @back
-6. 가게 이름/주소, 배달료, 배달 목표 시간, 가게~라이더 사이 거리, 가게~고객 거리를 라이더한테 줌 @back
+/* It is inefficient to search the entire DB every time a request comes in.
+   Instead, it is most efficient to filter riders and send them requests. -> use socket
+1. If within the current activity area, send GPS latitude and longitude. @front -> Check if the rider is within the activity area
+2. Fetch the list from the DB @back
+3. Validate if the store is within the activity area @back
+4. Filter only those that match the rider's transportation mode -> By this point, we've filtered requests that I have the right to deliver @back
+5. Calculate the distance between the filtered requests and the rider's location @back
+6. Send the store name/address, delivery fee, delivery target time, distance between the store and rider, and distance from the store to the customer to the rider @back
 */
 @Slf4j
 @Service
@@ -57,33 +57,33 @@ public class DeliveryRequestServiceImpl implements DeliveryRequestService {
 
     public List<DeliveryRequest> findNearByOrders(Long riderId, RiderAssignRequest req) throws JsonProcessingException {
         Rider rider = riderService.getById(riderId);
-        if (rider.isNotActive()) throw new RiderNotActiveException(); // rider가 활성화 상태인지 확인
+        if (rider.isNotActive()) throw new RiderNotActiveException(); // Check if the rider is active
         GeoHash centerGeoHash = GeoHash.withCharacterPrecision(req.latitude(), req.longitude(), GEO_HASH_PRECISION);
-        // 라이더 기준 가로, 세로 150m X 150m 로 격자(bounding box) 생성
+        // Create a bounding box of 150m X 150m centered on the rider's location
         BoundingBox searchArea = centerGeoHash.getBoundingBox();
-        // 라이더 기준 가로, 세로 5km 추가하여 bounding box 확장
+        // Expand the bounding box by an additional 5km from the rider's location
         BoundingBox expandedBox = GeoHashUtil.expandBoundingBox(searchArea, req.latitude());
-        // bounding box 안에서 150m 간격으로 geoHash 추출
+        // Extract geoHash values at 150m intervals within the bounding box
         List<String> nearByHashes = GeoHashUtil.coverBoundingBox(expandedBox, GEO_HASH_PRECISION);
         log.info(nearByHashes.toString());
         List<DeliveryRequest> nearbyOrders = new ArrayList<>();
-        // REDIS_HASH_KEY(rider_locations)를 key로 가진 데이터 모두 가져오기 @redis
+        // Fetch all data with the key REDIS_HASH_KEY (rider_locations) @redis
         Map<Object, Object> storedDeliveryRequests = redisTemplate.opsForHash().entries(REDIS_HASH_KEY);
         ObjectMapper objectMapper = new ObjectMapper();
-        // redis에 저장되어있는 각 배달 건 확인
+        // Check each delivery request stored in redis
         for (Map.Entry<Object, Object> entry : storedDeliveryRequests.entrySet()) {
-            String storedGeoHash = (String) entry.getValue(); // 배달 건의 geohash값 가져오기
+            String storedGeoHash = (String) entry.getValue(); // Get the geohash value of the delivery request
             log.info(entry.toString());
-            // 라이더의 5km 이내에 있는 geohash 범위에 배달 건의 geohash가 포함되는지 검증
+            // Validate if the delivery request's geohash is within the rider's 5km radius geohash range
             if (nearByHashes.contains(storedGeoHash)) {
                 DeliveryRequest deliveryRequest = objectMapper.readValue(entry.getKey().toString(), DeliveryRequest.class);
-                // 가게의 구(ex. 노원구) 꺼내기, storeAddress 예시: "서울시 노원구 동일로"
+                // Extract the district of the store (e.g., Nowon-gu), example storeAddress: "Seoul Nowon-gu Dongil-ro"
                 String[] storeAddress = deliveryRequest.getStoreAddress().split(" ");
                 String storeDistrict = storeAddress[1];
-                // 가게가 내 활동 범위에 있는지, 배달 요청에 내 이동수단이 포함되는지 그리고 이미 라이더가 배정되었는지 검증
+                // Validate if the store is within the rider's activity area, if the delivery request includes the rider's transportation, and if the rider is already assigned
                 if (deliveryRequest.isNotAssigned() && rider.getActivityArea().contains(storeDistrict)
                         && deliveryRequest.getTransportations().contains(rider.getTransportation())) {
-                    // 가게 부담 배달비 계산 (이동수단과 가게 ~ 고객 거리 고려)
+                    // Calculate the delivery cost burdened by the store (considering transportation mode and distance from store to customer)
                     int costByDistance = (int) (rider.getTransportation().costPerKm * deliveryRequest.getDistanceFromStoreToCustomer());
                     int totalCost = deliveryRequest.getDeliveryPay() + costByDistance;
                     deliveryRequest.setDeliveryPay(totalCost);
@@ -94,10 +94,9 @@ public class DeliveryRequestServiceImpl implements DeliveryRequestService {
         return nearbyOrders;
     }
 
-
     public List<RiderAssignResponse> assignRider(Long riderId, RiderAssignRequest req) {
         Rider rider = riderService.getById(riderId);
-        if (rider.isNotActive()) throw new RiderNotActiveException(); // rider가 활성화 상태인지 확인
+        if (rider.isNotActive()) throw new RiderNotActiveException(); // Check if the rider is active
         List<DeliveryRequest> deliveryRequests = deliveryRequestRedisRepository.findAll();
         log.info(deliveryRequests.toString());
         String key = REDIS_GEO_KEY;
@@ -108,23 +107,23 @@ public class DeliveryRequestServiceImpl implements DeliveryRequestService {
         List<RiderAssignResponse> list = new ArrayList<>();
 
         for (DeliveryRequest deliveryRequest : deliveryRequests) {
-            // 가게의 구(ex. 노원구) 꺼내기
+            // Extract the district of the store (e.g., Nowon-gu)
             String[] storeAddress = deliveryRequest.getStoreAddress().split(" ");
             String storeDistrict = storeAddress[1];
 
-            // 가게가 내 활동 범위에 있는지, 배달 요청에 내 이동수단이 포함되는지 그리고 이미 라이더가 배정되었는지 검증
+            // Validate if the store is within the rider's activity area, if the delivery request includes the rider's transportation, and if the rider is already assigned
             if(deliveryRequest.isNotAssigned() && rider.getActivityArea().contains(storeDistrict)
                     && deliveryRequest.getTransportations().contains(rider.getTransportation())) {
-                // 맞다면 요청 목록에 추가
+                // If valid, add to the request list
                 geoOperations.add(
                         key,
                         new Point(deliveryRequest.getStoreLongitude(), deliveryRequest.getStoreLatitude()),
                         REDIS_GEO_MEMBER_STORE);
                 Distance distance = geoOperations.distance(key, REDIS_GEO_MEMBER_RIDER, REDIS_GEO_MEMBER_STORE, metric);
 
-                // 라이더 ~ 가게 거리가 5km 이내에 있다면 배정
+                // If the distance between the rider and the store is within 5km, assign the request
                 if (distance.getValue() <= MAX_DELIVERABLE_DISTANCE) {
-                    // 가게 부담 배달비 계산 (이동수단과 가게 ~ 고객 거리 고려)
+                    // Calculate the delivery cost burdened by the store (considering transportation mode and distance from store to customer)
                     int costByDistance = (int) (rider.getTransportation().costPerKm * deliveryRequest.getDistanceFromStoreToCustomer());
                     int totalCost = deliveryRequest.getDeliveryPay() + costByDistance;
                     RiderAssignResponse response = RiderAssignResponse.from(deliveryRequest, distance, totalCost);
@@ -132,18 +131,18 @@ public class DeliveryRequestServiceImpl implements DeliveryRequestService {
                 }
             }
         }
-//         요청 목록 return
+//         Return the request list
         return list;
     }
 
     @KafkaListener(topics = "order-topic", id = "delivery")
     public void saveOrder(KafkaStatus<KafkaDeliveryRequestDto> dto) throws JsonProcessingException {
         if (dto.status().equals("insert")) {
-            // 가게 ~ 고객 거리에 따라 배달 가능한 이동 수단 제한
+            // Limit available transportation modes based on the distance from the store to the customer
             List<Transportation> transportations = Transportation
                     .chooseTransportationByDistance(dto.data().distanceFromStoreToCustomer());
             DeliveryRequest deliveryRequest = dto.data().toEntity(transportations);
-            // 가게를 중심으로 150m X 150m 의 격자를 만듦
+            // Create a 150m X 150m grid centered on the store
             GeoHash geoHash = GeoHash.withCharacterPrecision(
                     dto.data().storeLatitude(),
                     dto.data().storeLongitude(),
@@ -154,8 +153,6 @@ public class DeliveryRequestServiceImpl implements DeliveryRequestService {
             redisTemplate.opsForHash().put(REDIS_HASH_KEY, deliveryRequestJson, geoHashString);
         }
     }
-
-
 
     @Override
     public void deleteDeliveryRequest(String deliveryRequestJson) {

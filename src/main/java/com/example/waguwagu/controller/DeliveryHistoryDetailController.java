@@ -14,25 +14,25 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/riders/delivery-history-details")
-@Tag(name = "배달 내역 상세")
+@Tag(name = "Delivery History Detail")
 public class DeliveryHistoryDetailController {
     private final DeliveryHistoryDetailService deliveryHistoryDetailService;
 
     @PostMapping("/delivery-history/{deliveryHistoryId}")
-    @Operation(summary = "배달 내역 상세 저장")
+    @Operation(summary = "Save delivery history detail")
     public void saveDeliveryHistoryDetail(@PathVariable Long deliveryHistoryId, @RequestBody DeliveryHistoryDetailRequest req) {
         deliveryHistoryDetailService.saveDeliveryHistoryDetail(deliveryHistoryId, req);
     }
 
     @GetMapping("/delivery-history/{deliveryHistoryId}")
-    @Operation(summary = "배달 내역 ID로 배달 내역 상세 가져오기")
+    @Operation(summary = "Retrieve delivery history details by delivery history ID")
     public List<DeliveryHistoryDetailResponse> getByDeliveryHistoryId(@PathVariable Long deliveryHistoryId) {
         return deliveryHistoryDetailService.getByDeliveryHistoryId(deliveryHistoryId);
     }
+
     @GetMapping("/summary/delivery-history/{deliveryHistoryId}")
-    @Operation(summary = "배달 내역 ID로 특정 날짜의 배달 횟수 및 배달 합산액 가져오기")
+    @Operation(summary = "Get the number of deliveries and total amount for a specific date by delivery history ID")
     public DeliveryHistorySummaryResponse getSummaryByDeliveryHistoryId(@PathVariable Long deliveryHistoryId) {
         return deliveryHistoryDetailService.getSummaryByDeliveryHistoryId(deliveryHistoryId);
     }
-
 }

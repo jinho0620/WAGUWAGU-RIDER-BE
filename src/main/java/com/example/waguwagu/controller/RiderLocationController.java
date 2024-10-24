@@ -13,24 +13,24 @@ import java.util.UUID;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/riders/rider-locations")
-@Tag(name = "배달 기사 위치")
+@Tag(name = "Delivery Rider Location")
 public class RiderLocationController {
     private final RiderLocationService riderLocationService;
 
     @PostMapping
-    @Operation(summary = "배달 기사 위치 저장")
+    @Operation(summary = "Save delivery rider location")
     public void saveRiderLocation(@RequestBody RiderLocationRequest req) {
         riderLocationService.saveRiderLocation(req);
     }
 
     @GetMapping("/{orderId}")
-    @Operation(summary = "주문 ID로 배달 기사 위치 및 이동 수단 가져오기")
+    @Operation(summary = "Retrieve delivery rider location and transportation method by order ID")
     public RiderLocationResponse getByOrderId(@PathVariable UUID orderId) {
         return riderLocationService.getByOrderId(orderId);
     }
 
     @DeleteMapping("/{orderId}")
-    @Operation(summary = "주문 ID로 배달 기사 위치 삭제")
+    @Operation(summary = "Delete delivery rider location by order ID")
     public void deleteByOrderId(@PathVariable UUID orderId) {
         riderLocationService.deleteByOrderId(orderId);
     }

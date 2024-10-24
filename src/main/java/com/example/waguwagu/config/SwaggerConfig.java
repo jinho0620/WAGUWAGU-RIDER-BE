@@ -32,8 +32,8 @@ public class SwaggerConfig {
 
     private Info apiInfo() {
         return new Info()
-                .title("와구와구 배달 기사 API")
-                .description("API 사용 메뉴얼")
+                .title("WAGUWAGU RIDER API")
+                .description("API Manual")
                 .version("0.0.1");
     }
 }

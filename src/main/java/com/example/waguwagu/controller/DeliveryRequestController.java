@@ -18,20 +18,20 @@ import java.util.UUID;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/riders/delivery-requests")
-@Tag(name = "배달 요청 내역")
+@Tag(name = "Delivery Request History")
 public class DeliveryRequestController {
     private final DeliveryRequestService deliveryRequestService;
 
-    // @AuthenticationPrincipal 필요 (security 추가 후)
+    // @AuthenticationPrincipal is needed (after adding security)
     @PostMapping("/riders/{riderId}/assign")
-    @Operation(summary = "배달 기사의 자격 검증 후 배달 요청 건 가져오기")
+    @Operation(summary = "Retrieve delivery requests after verifying the qualifications of the rider")
     public List<DeliveryRequest> assignRider(@PathVariable Long riderId, @RequestBody RiderAssignRequest req) throws JsonProcessingException {
         return deliveryRequestService.findNearByOrders(riderId, req);
     }
 
-    // 배달 완료 되면 redis 의 요청 목록 삭제 및 postgres에 배달 내역 저장
+    // When delivery is completed, delete the request from Redis and save the delivery history in PostgreSQL
     @PostMapping("/delete")
-    @Operation(summary = "ID로 배달 요청 건 삭제")
+    @Operation(summary = "Delete delivery request by ID")
     public void deleteDeliveryRequest(@RequestBody String deliveryRequestJson) {
         deliveryRequestService.deleteDeliveryRequest(deliveryRequestJson);
     }

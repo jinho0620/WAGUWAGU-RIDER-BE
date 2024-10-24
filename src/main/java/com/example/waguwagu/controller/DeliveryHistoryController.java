@@ -12,7 +12,7 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/riders/delivery-histories")
-@Tag(name = "배달 내역")
+@Tag(name = "Delivery History")
 public class DeliveryHistoryController {
     private final DeliveryHistoryService deliveryHistoryService;
 
@@ -28,18 +28,18 @@ public class DeliveryHistoryController {
 //    }
 
     @PostMapping("/rider/{riderId}")
-    @Operation(summary = "배달 내역 저장")
+    @Operation(summary = "Store delivery history")
     public Long saveDeliveryHistory(@PathVariable Long riderId) {
         return deliveryHistoryService.saveDeliveryHistory(riderId);
     }
 
     @GetMapping("/rider/{riderId}")
-    @Operation(summary = "배달 기사 ID로 배달 내역 가져오기")
+    @Operation(summary = "Retrieve delivery history by id")
     public List<DeliveryHistoryResponse> getDeliveryHistories(@PathVariable Long riderId) {
         return deliveryHistoryService.getDeliveryHistories(riderId);
     }
     @GetMapping("/today/rider/{riderId}")
-    @Operation(summary = "배달 기사 ID로 배달 일자 및 요일 가져오기")
+    @Operation(summary = "Retrieve delivery date and day of the week by delivery rider ID")
     public DeliveryHistoryResponse getTodayDeliveryHistory(@PathVariable Long riderId) {
         return deliveryHistoryService.getTodayDeliveryHistory(riderId);
     }

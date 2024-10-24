@@ -13,12 +13,12 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/riders/geo")
-@Tag(name = "직선 거리 계산")
+@Tag(name = "Straight-Line Distance Calculation")
 public class GeoDistanceController {
     private final GeoDistanceService geoDistanceService;
 
     @PostMapping
-    @Operation(summary = "두 지점의 위,경도로 직선 거리 계산")
+    @Operation(summary = "Calculate straight-line distance between two points based on latitude and longitude")
     public double calculateDistance(@RequestBody GeoDistanceRequest req) {
         return geoDistanceService.calculateDistance(req);
     }
