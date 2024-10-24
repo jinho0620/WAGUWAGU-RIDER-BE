@@ -45,11 +45,12 @@ https://github.com/WAGUWAGUUU/WAGUWAGU
 
 <br><br>
 ## 🧾 Data Flow Diagram<br><br>
-<img width="902" alt="image" src="https://github.com/user-attachments/assets/60cacfe4-a8a1-485b-a0ff-3ff7e74321cb">
-<br>
+
 <img width="885" alt="image" src="https://github.com/user-attachments/assets/44fdfa5a-2ade-4e62-9963-7f2417cfddc1">
 <br>
 <img width="902" alt="image" src="https://github.com/user-attachments/assets/965243bb-baf2-438a-896b-a5cba4a26082">
+<img width="881" alt="image" src="https://github.com/user-attachments/assets/05a4362d-f869-46dd-ac75-de076d102a42">
+<br>
 
 
 
