@@ -58,8 +58,8 @@ https://github.com/WAGUWAGUUU/WAGUWAGU
 <img width="886" alt="image" src="https://github.com/user-attachments/assets/ce980faf-a0e8-43d1-93fb-6c5c3fe2e94e">
 
 ##  <br>🔧 Performance Improvements
+<img width="950" alt="image" src="https://github.com/user-attachments/assets/86f3c20a-3941-4fb8-bea6-388438ea674d">
 
-<img width="956" alt="image" src="https://github.com/user-attachments/assets/83f2b723-533c-46b7-818c-2deb3186d69e">
 
 
 
