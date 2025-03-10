@@ -3,13 +3,11 @@ package com.example.waguwagu.service;
 import ch.hsr.geohash.BoundingBox;
 import ch.hsr.geohash.GeoHash;
 import com.example.waguwagu.domain.dto.request.RiderAssignRequest;
-import com.example.waguwagu.domain.dto.response.NearByOrderResponse;
 import com.example.waguwagu.domain.dto.response.RiderAssignResponse;
 import com.example.waguwagu.domain.entity.DeliveryRequest;
 import com.example.waguwagu.domain.entity.Rider;
 import com.example.waguwagu.domain.type.Transportation;
 import com.example.waguwagu.global.dao.RiderDao;
-import com.example.waguwagu.global.exception.DeliveryRequestNotFoundException;
 import com.example.waguwagu.global.repository.DeliveryRequestRedisRepository;
 import com.example.waguwagu.global.repository.RiderRepository;
 import com.example.waguwagu.global.util.GeoHashUtil;
@@ -18,7 +16,6 @@ import com.example.waguwagu.kafka.dto.KafkaDeliveryRequestDto;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.transaction.Transactional;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -366,13 +363,27 @@ class DeliveryRequestServiceImplTest {
     }
 
     @Test
-    void coverBoundingBox_success() {
+    void coverBoundingBoxWithArrayList_success() {
         double riderLatitude = 37.654527;
         double riderLongitude = 127.060551;
         GeoHash centerGeoHash = GeoHash.withCharacterPrecision(riderLatitude, riderLongitude, GEO_HASH_PRECISION);
         BoundingBox originalBox = centerGeoHash.getBoundingBox();
         BoundingBox expandedBox = GeoHashUtil.expandBoundingBox(originalBox, riderLatitude);
-        List<String> geoHashes = GeoHashUtil.coverBoundingBox(expandedBox, 7);
+        List<String> geoHashes = GeoHashUtil.coverBoundingBoxWithArrayList(expandedBox, 7);
+        System.out.println(geoHashes);
+        System.out.println(geoHashes.size());
+
+        assertNotNull(geoHashes);
+    }
+
+    @Test
+    void coverBoundingBoxWithHashSet_success() {
+        double riderLatitude = 37.654527;
+        double riderLongitude = 127.060551;
+        GeoHash centerGeoHash = GeoHash.withCharacterPrecision(riderLatitude, riderLongitude, GEO_HASH_PRECISION);
+        BoundingBox originalBox = centerGeoHash.getBoundingBox();
+        BoundingBox expandedBox = GeoHashUtil.expandBoundingBox(originalBox, riderLatitude);
+        Set<String> geoHashes = GeoHashUtil.coverBoundingBoxWithHashSet(expandedBox, 7);
         System.out.println(geoHashes);
         System.out.println(geoHashes.size());
 
@@ -403,7 +414,7 @@ class DeliveryRequestServiceImplTest {
 
     @Test
     @Transactional
-    void performanceTest_geohash() throws JsonProcessingException {
+    void performanceTest_geohash_with_array_list() throws JsonProcessingException {
         Rider rider = Rider.builder()
                 .id(1000L)
                 .email("wlshzz@naver.com")
@@ -472,10 +483,80 @@ class DeliveryRequestServiceImplTest {
         System.out.println("배달 건 갯수: " + res.size());
 
     }
+
+    @Test
+    @Transactional
+    void performanceTest_geohash_with_hash_set() throws JsonProcessingException {
+        Rider rider = Rider.builder()
+                .id(1000L)
+                .email("wlshzz@naver.com")
+                .nickname("Jinho")
+                .phoneNumber("123-456-7890")
+                .activityArea(Arrays.asList("노원구", "도봉구", "서초구"))
+                .transportation(Transportation.MOTORBIKE)
+                .account("123-456-789")
+                .deleted(false)
+                .active(true)
+                .build();
+
+        riderRepository.save(rider);
+
+
+        RiderAssignRequest riderAssignRequest = new RiderAssignRequest(127.060551, 37.654527);
+
+        for (int i = 0; i < 3333; i++) {
+            KafkaDeliveryRequestDto dto1 = new KafkaDeliveryRequestDto(
+                    UUID.randomUUID(),
+                    "장꼬방묵은김치찌개전문",
+                    "서울 서초구 효령로 364",
+                    15000,
+                    10,
+                    127.0236714,
+                    37.48686000000001 ,
+                    new Timestamp(System.currentTimeMillis())
+            );
+
+            KafkaDeliveryRequestDto dto2 = new KafkaDeliveryRequestDto(
+                    UUID.randomUUID(),
+                    "수유리 우동집",
+                    "서울시 도봉구 덕릉로",
+                    20000,
+                    3.5,
+                    127.03858841582063,
+                    37.64198329793004,
+                    new Timestamp(System.currentTimeMillis())
+            );
+
+            KafkaDeliveryRequestDto dto3 = new KafkaDeliveryRequestDto(
+                    UUID.randomUUID(),
+                    "건영시네마 팝콘집",
+                    "서울시 노원구 동일로",
+                    10000,
+                    3.5,
+                    127.06123427906414,
+                    37.646494046602385,
+                    new Timestamp(System.currentTimeMillis())
+            );
+
+            KafkaStatus<KafkaDeliveryRequestDto> kafkaDto1 = new KafkaStatus<>(dto1, "insert");
+            KafkaStatus<KafkaDeliveryRequestDto> kafkaDto2 = new KafkaStatus<>(dto2, "insert");
+            KafkaStatus<KafkaDeliveryRequestDto> kafkaDto3 = new KafkaStatus<>(dto3, "insert");
+
+            deliveryRequestServiceImpl.saveOrder(kafkaDto1);
+            deliveryRequestServiceImpl.saveOrder(kafkaDto2);
+            deliveryRequestServiceImpl.saveOrder(kafkaDto3);
+        }
+        StopWatch stopWatch = new StopWatch();
+        stopWatch.start();
+        List<DeliveryRequest> res = deliveryRequestServiceImpl.findNearByOrders(1000L, riderAssignRequest);
+        stopWatch.stop();
+        long elapsedTime = stopWatch.getTotalTimeMillis();
+        System.out.println("코드 실행 시간: " + elapsedTime + "밀리초 with geohash");
+        System.out.println("배달 건 갯수: " + res.size());
+    }
     @Test
     @Transactional
     void performanceTest_calculation() throws JsonProcessingException {
-
         RiderAssignRequest riderAssignRequest = new RiderAssignRequest(127.060551, 37.654527);
         for (int i = 0; i < 3333; i++) {
             Rider rider = Rider.builder()

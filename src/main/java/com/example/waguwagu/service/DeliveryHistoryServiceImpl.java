@@ -39,18 +39,6 @@ public class DeliveryHistoryServiceImpl implements DeliveryHistoryService {
         }
     }
 
-//    @Override
-//    public List<Long> getDeliveryHistories(Long riderId, DurationForHistoryRequest dto) {
-//        List<DeliveryHistory> histories = deliveryHistoryDao.findByIdBetweenTheseDates(
-//                riderId,
-//                dto.from().atStartOfDay(),
-//                dto.to().plusDays(1).atStartOfDay());
-//        List<Long> response = new ArrayList<>();
-//        histories.forEach(history -> response.add(history.getDeliveryHistoryId()));
-//        return response;
-//    }
-
-
     @Override
     public List<DeliveryHistoryResponse> getDeliveryHistories(Long riderId) {
         List<DeliveryHistory> histories = deliveryHistoryDao.findByRiderId(riderId);

@@ -5,7 +5,9 @@ import ch.hsr.geohash.GeoHash;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Component
 public class GeoHashUtil {
@@ -15,9 +17,31 @@ public class GeoHashUtil {
     private static final double METER_150_TO_DEGREE = 0.001351;
 
 
-    public static List<String> coverBoundingBox(BoundingBox boundingBox, int precision) {
+    public static List<String> coverBoundingBoxWithArrayList(BoundingBox boundingBox, int precision) {
         List<String> geoHashes = new ArrayList<>();
 
+        // 라이더 기준 가로, 세로 5km 격자 (bounding box)의 위,경도 가져오기
+        double south = boundingBox.getSouthWestCorner().getLatitude();
+        double north = boundingBox.getNorthEastCorner().getLatitude();
+        double west = boundingBox.getSouthWestCorner().getLongitude();
+        double east = boundingBox.getNorthEastCorner().getLongitude();
+
+        // bounding box 안에서 geohash를 확인할 간격 : 150m
+        double latStep = METER_150_TO_DEGREE;
+        double lonStep = METER_150_TO_DEGREE;
+
+        // bounding box 안에서 150m 간격으로 geoHash 확인
+        for (double lat = south; lat <= north; lat += latStep) {
+            for (double lon = west; lon <= east; lon += lonStep) {
+                GeoHash geoHash = GeoHash.withCharacterPrecision(lat, lon, precision);
+                geoHashes.add(geoHash.toBase32());
+            }
+        }
+        return geoHashes;
+    }
+
+    public static Set<String> coverBoundingBoxWithHashSet(BoundingBox boundingBox, int precision) {
+        Set<String> geoHashes = new HashSet<>();
         // 라이더 기준 가로, 세로 5km 격자 (bounding box)의 위,경도 가져오기
         double south = boundingBox.getSouthWestCorner().getLatitude();
         double north = boundingBox.getNorthEastCorner().getLatitude();

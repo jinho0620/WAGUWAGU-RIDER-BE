@@ -32,11 +32,6 @@ public class RiderServiceImpl implements RiderService {
         if (kafkaStatus.status().equals("update")) riderDao.update(kafkaStatus.data());
     }
 
-//    public void saveRider(Rider rider) {
-////        log.info("Rider data Received~");
-//        riderDao.save(rider);
-//    }
-
     @Override
     public Rider getById(Long id) {
         Rider rider = riderDao.findById(id);

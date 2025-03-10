@@ -31,6 +31,7 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 
 /* 요청이 올 때마다 DB 전체를 뒤지는 것은 비효율적이다. 요청이 들어올 때마다, 라이더들을 추려내서 쏴주는 것이 가장 효율적이다. -> socket 이용
@@ -64,8 +65,7 @@ public class DeliveryRequestServiceImpl implements DeliveryRequestService {
         // 라이더 기준 가로, 세로 5km 추가하여 bounding box 확장
         BoundingBox expandedBox = GeoHashUtil.expandBoundingBox(searchArea, req.latitude());
         // bounding box 안에서 150m 간격으로 geoHash 추출
-        List<String> nearByHashes = GeoHashUtil.coverBoundingBox(expandedBox, GEO_HASH_PRECISION);
-        log.info(nearByHashes.toString());
+        Set<String> nearByHashes = GeoHashUtil.coverBoundingBoxWithHashSet(expandedBox, GEO_HASH_PRECISION);
         List<DeliveryRequest> nearbyOrders = new ArrayList<>();
         // REDIS_HASH_KEY(rider_locations)를 key로 가진 데이터 모두 가져오기 @redis
         Map<Object, Object> storedDeliveryRequests = redisTemplate.opsForHash().entries(REDIS_HASH_KEY);
@@ -73,7 +73,6 @@ public class DeliveryRequestServiceImpl implements DeliveryRequestService {
         // redis에 저장되어있는 각 배달 건 확인
         for (Map.Entry<Object, Object> entry : storedDeliveryRequests.entrySet()) {
             String storedGeoHash = (String) entry.getValue(); // 배달 건의 geohash값 가져오기
-            log.info(entry.toString());
             // 라이더의 5km 이내에 있는 geohash 범위에 배달 건의 geohash가 포함되는지 검증
             if (nearByHashes.contains(storedGeoHash)) {
                 DeliveryRequest deliveryRequest = objectMapper.readValue(entry.getKey().toString(), DeliveryRequest.class);
