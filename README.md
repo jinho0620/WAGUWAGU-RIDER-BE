@@ -55,9 +55,8 @@ https://github.com/WAGUWAGUUU/WAGUWAGU
 
 ##  <br>🔧 성능 개선 사항
 
-<img width="956" alt="image" src="https://github.com/user-attachments/assets/83f2b723-533c-46b7-818c-2deb3186d69e">
-
-
+<img width="956" alt="image" src="https://github.com/user-attachments/assets/f1a66729-1860-4496-8aa9-41f42e3f2a4c">
+<img width="956" alt="image" src="https://github.com/user-attachments/assets/926d6860-3dc2-41b2-ad87-897a6bb0f951">
 
 
 ##  <br>🔧 트러블 슈팅
